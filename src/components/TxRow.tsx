@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { ParsedTx } from "../utils/parseTransaction";
 import type { ParsedAction } from "../utils/parseTransaction";
-import { formatGas } from "../utils/format";
+import GasAmount from "./GasAmount";
 import TransactionHash from "./TransactionHash";
 import TimeAgo from "./TimeAgo";
 import AccountId from "./AccountId";
@@ -86,7 +86,7 @@ export default function TxRow({ tx, timestamp }: TxRowProps) {
         <ActionList actions={tx.actions} />
       </td>
       <td className="whitespace-nowrap px-4 py-3 text-xs">
-        {formatGas(tx.gas_burnt)}
+        <GasAmount gas={tx.gas_burnt} />
       </td>
       <td className="whitespace-nowrap px-4 py-3">
         {tx.is_success ? (

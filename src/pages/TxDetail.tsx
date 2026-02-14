@@ -4,7 +4,8 @@ import { getTransactions } from "../api/endpoints";
 import type { TransactionDetail, ReceiptWithOutcome } from "../api/types";
 import { getMatchingWidgets } from "../widgets/registry";
 import { parseTransaction, parseAction } from "../utils/parseTransaction";
-import { formatGas, formatNear } from "../utils/format";
+import GasAmount from "../components/GasAmount";
+import NearAmount from "../components/NearAmount";
 import TransactionHash from "../components/TransactionHash";
 import AccountId from "../components/AccountId";
 import BlockHeight from "../components/BlockHeight";
@@ -155,11 +156,11 @@ function ReceiptCard({ r }: { r: ReceiptWithOutcome }) {
         </div>
         <div>
           <dt className="shrink-0 text-gray-500">Gas Burnt</dt>
-          <dd>{formatGas(outcome.gas_burnt)}</dd>
+          <dd><GasAmount gas={outcome.gas_burnt} /></dd>
         </div>
         <div>
           <dt className="shrink-0 text-gray-500">Tokens Burnt</dt>
-          <dd>{formatNear(outcome.tokens_burnt)}</dd>
+          <dd><NearAmount yoctoNear={outcome.tokens_burnt} /></dd>
         </div>
       </dl>
 
@@ -285,11 +286,11 @@ export default function TxDetail() {
           </div>
           <div>
             <dt className="shrink-0 text-gray-500">Gas Used</dt>
-            <dd>{formatGas(totalGas)}</dd>
+            <dd><GasAmount gas={totalGas} /></dd>
           </div>
           <div>
             <dt className="shrink-0 text-gray-500">Tokens Burnt</dt>
-            <dd>{formatNear(totalTokensBurnt.toString())}</dd>
+            <dd><NearAmount yoctoNear={totalTokensBurnt.toString()} /></dd>
           </div>
         </dl>
       </div>

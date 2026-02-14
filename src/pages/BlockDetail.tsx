@@ -9,7 +9,8 @@ import TimeAgo from "../components/TimeAgo";
 import Pagination from "../components/Pagination";
 import useTxDetails from "../hooks/useTxDetails";
 import TxRow, { TxTableHeader } from "../components/TxRow";
-import { formatNear, formatGas } from "../utils/format";
+import GasAmount from "../components/GasAmount";
+import NearAmount from "../components/NearAmount";
 
 const PAGE_SIZE = 20;
 
@@ -113,15 +114,15 @@ export default function BlockDetail() {
           </div>
           <div>
             <dt className="shrink-0 text-gray-500">Gas Used</dt>
-            <dd>{formatGas(Number(block.gas_burnt))}</dd>
+            <dd><GasAmount gas={Number(block.gas_burnt)} /></dd>
           </div>
           <div>
             <dt className="shrink-0 text-gray-500">Gas Price</dt>
-            <dd>{formatNear(block.gas_price)}</dd>
+            <dd><NearAmount yoctoNear={block.gas_price} /></dd>
           </div>
           <div>
             <dt className="shrink-0 text-gray-500">Tokens Burnt</dt>
-            <dd>{formatNear(block.tokens_burnt)}</dd>
+            <dd><NearAmount yoctoNear={block.tokens_burnt} /></dd>
           </div>
           <div>
             <dt className="shrink-0 text-gray-500">Chunks</dt>

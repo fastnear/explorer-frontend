@@ -11,13 +11,14 @@ import {
 } from "lucide-react";
 import JsonView from "@uiw/react-json-view";
 import type { ParsedAction } from "../utils/parseTransaction";
-import { formatNear, formatGas } from "../utils/format";
+import GasAmount from "./GasAmount";
+import NearAmount from "./NearAmount";
 
 const iconClass = "inline-block size-3.5 text-gray-400";
 
 function Deposit({ deposit }: { deposit?: string }) {
   if (!deposit || deposit === "0") return null;
-  return <span className="ml-1 text-gray-500">({formatNear(deposit)})</span>;
+  return <span className="ml-1 text-gray-500">(<NearAmount yoctoNear={deposit} />)</span>;
 }
 
 function ActionFunctionCall({ action }: { action: ParsedAction }) {
@@ -119,13 +120,12 @@ export function ActionExpanded({ action }: { action: ParsedAction }) {
         {action.gas != null && (
           <span className="flex items-center gap-1 text-xs text-gray-500">
             <Fuel className="size-3 text-gray-400" />
-            {formatGas(action.gas)}
+            <GasAmount gas={action.gas} />
           </span>
         )}
         {action.deposit && action.deposit !== "0" && (
-          <span className="flex items-center gap-1 text-xs text-gray-500">
-            <span className="text-gray-400">Ⓝ</span>
-            {formatNear(action.deposit)}
+          <span className="text-xs text-gray-500">
+            <NearAmount yoctoNear={action.deposit} />
           </span>
         )}
       </div>
