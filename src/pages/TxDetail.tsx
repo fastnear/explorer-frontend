@@ -64,22 +64,30 @@ function ReceiptResult({ status }: { status: Record<string, unknown> }) {
       const decoded = atob(raw);
       try {
         const json = JSON.parse(decoded);
+        if (typeof json === "object" && json !== null) {
+          return (
+            <div className="overflow-auto rounded bg-gray-50 p-2 text-xs">
+              <JsonView value={json} collapsed={2} displayDataTypes={false} shortenTextAfterLength={512} />
+            </div>
+          );
+        }
+        const serialized = JSON.stringify(json);
         return (
-          <div className="overflow-auto rounded bg-gray-50 p-2 text-xs">
-            <JsonView value={json} collapsed={2} displayDataTypes={false} shortenTextAfterLength={512} />
+          <div className="rounded bg-gray-50 p-2 font-mono text-xs break-all">
+            {serialized.length > 512 ? serialized.slice(0, 512) + "..." : serialized}
           </div>
         );
       } catch {
         return (
           <div className="rounded bg-gray-50 p-2 font-mono text-xs break-all">
-            {decoded}
+            {decoded.length > 512 ? decoded.slice(0, 512) + "..." : decoded}
           </div>
         );
       }
     } catch {
       return (
         <div className="rounded bg-gray-50 p-2 font-mono text-xs break-all">
-          {raw}
+          {raw.length > 512 ? raw.slice(0, 512) + "..." : raw}
         </div>
       );
     }

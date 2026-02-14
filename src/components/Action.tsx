@@ -18,7 +18,7 @@ const iconClass = "inline-block size-3.5 text-gray-400";
 
 function Deposit({ deposit }: { deposit?: string }) {
   if (!deposit || deposit === "0") return null;
-  return <span className="ml-1 text-gray-500">(<NearAmount yoctoNear={deposit} />)</span>;
+  return <span className="ml-1 text-gray-500"><NearAmount yoctoNear={deposit} /></span>;
 }
 
 function ActionFunctionCall({ action }: { action: ParsedAction }) {
