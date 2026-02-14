@@ -4,6 +4,7 @@ import { timeAgo } from "../utils/time";
 import TransactionHash from "./TransactionHash";
 import AccountId from "./AccountId";
 import Action from "./Action";
+import { CircleCheck, CircleX } from "lucide-react";
 
 interface TxRowProps {
   tx: ParsedTx;
@@ -21,7 +22,7 @@ export function TxTableHeader() {
         <th className={th}>Receiver</th>
         <th className={th}>Action</th>
         <th className={th}>Gas</th>
-        <th className={th}>Status</th>
+        <th className={th}></th>
       </tr>
     </thead>
   );
@@ -53,9 +54,11 @@ export default function TxRow({ tx, timestamp }: TxRowProps) {
         {formatGas(tx.gas_burnt)}
       </td>
       <td className="whitespace-nowrap px-4 py-3">
-        <span className={tx.is_success ? "text-green-600" : "text-red-600"}>
-          {tx.is_success ? "Success" : "Failed"}
-        </span>
+        {tx.is_success ? (
+          <CircleCheck className="size-4 text-green-600" />
+        ) : (
+          <CircleX className="size-4 text-red-600" />
+        )}
       </td>
     </tr>
   );
