@@ -9,12 +9,13 @@ import TransactionHash from "../components/TransactionHash";
 import AccountId from "../components/AccountId";
 import BlockHeight from "../components/BlockHeight";
 import TimeAgo from "../components/TimeAgo";
-import Action from "../components/Action";
+import { ActionExpanded } from "../components/Action";
+import JsonView from "@uiw/react-json-view";
 import { CircleCheck, CircleX, Radio } from "lucide-react";
 
 function EventLog({ log }: { log: string }) {
   if (!log.startsWith("EVENT_JSON:")) {
-    return <div className="whitespace-pre-wrap break-all">{log}</div>;
+    return <div className="whitespace-pre-wrap break-all rounded bg-gray-50 p-2 font-mono">{log}</div>;
   }
   try {
     const json = JSON.parse(log.slice("EVENT_JSON:".length));
@@ -27,15 +28,69 @@ function EventLog({ log }: { log: string }) {
           <span className="ml-1 text-gray-600">: {json.event}</span>
         )}
         {json.data && (
-          <pre className="mt-1 overflow-auto text-[11px] text-gray-500">
-            {JSON.stringify(json.data, null, 2)}
-          </pre>
+          <div className="mt-1 overflow-auto text-xs">
+            <JsonView value={json.data} collapsed={2} displayDataTypes={false} shortenTextAfterLength={512} />
+          </div>
         )}
       </div>
     );
   } catch {
-    return <div className="whitespace-pre-wrap break-all">{log}</div>;
+    return <div className="whitespace-pre-wrap break-all rounded bg-gray-50 p-2 font-mono">{log}</div>;
   }
+}
+
+function ReceiptResult({ status }: { status: Record<string, unknown> }) {
+  if ("SuccessReceiptId" in status) {
+    return (
+      <div className="rounded bg-gray-50 p-2 font-mono text-xs break-all">
+        Receipt:{" "}
+        <a href={`#receipt-${String(status.SuccessReceiptId)}`} className="text-blue-600 hover:underline">
+          {String(status.SuccessReceiptId)}
+        </a>
+      </div>
+    );
+  }
+  if ("SuccessValue" in status) {
+    const raw = String(status.SuccessValue);
+    if (!raw) {
+      return (
+        <div className="rounded bg-gray-50 p-2 font-mono text-xs text-gray-500">
+          Empty result
+        </div>
+      );
+    }
+    try {
+      const decoded = atob(raw);
+      try {
+        const json = JSON.parse(decoded);
+        return (
+          <div className="overflow-auto rounded bg-gray-50 p-2 text-xs">
+            <JsonView value={json} collapsed={2} displayDataTypes={false} shortenTextAfterLength={512} />
+          </div>
+        );
+      } catch {
+        return (
+          <div className="rounded bg-gray-50 p-2 font-mono text-xs break-all">
+            {decoded}
+          </div>
+        );
+      }
+    } catch {
+      return (
+        <div className="rounded bg-gray-50 p-2 font-mono text-xs break-all">
+          {raw}
+        </div>
+      );
+    }
+  }
+  if ("Failure" in status) {
+    return (
+      <div className="overflow-auto rounded bg-red-50 p-2 text-xs text-red-700">
+        <JsonView value={status.Failure as object} collapsed={2} displayDataTypes={false} />
+      </div>
+    );
+  }
+  return null;
 }
 
 function ReceiptCard({ r }: { r: ReceiptWithOutcome }) {
@@ -55,21 +110,23 @@ function ReceiptCard({ r }: { r: ReceiptWithOutcome }) {
       : [];
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white text-sm">
-      <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2">
-        <span className="font-mono text-xs text-gray-400 break-all">
-          {r.receipt.receipt_id}
-        </span>
-        <span className="ml-2 flex items-center gap-1">
-          {isSuccess ? (
-            <CircleCheck className="size-3.5 text-green-600" />
-          ) : (
-            <CircleX className="size-3.5 text-red-600" />
-          )}
-        </span>
-      </div>
-
-      <dl className="grid gap-px sm:grid-cols-2 [&>div]:flex [&>div]:gap-2 [&>div]:border-b [&>div]:border-gray-100 [&>div]:px-4 [&>div]:py-2 [&>div:last-child]:border-b-0 [&>div:nth-last-child(2)]:sm:border-b-0">
+    <div id={`receipt-${r.receipt.receipt_id}`} className="rounded-lg border border-gray-200 bg-white text-sm">
+      <dl className="grid gap-px sm:grid-cols-2 [&>div]:flex [&>div]:items-center [&>div]:gap-2 [&>div]:border-b [&>div]:border-gray-100 [&>div]:px-4 [&>div]:py-2 [&>div:last-child]:border-b-0 [&>div:nth-last-child(2)]:sm:border-b-0">
+        <div className="sm:col-span-2">
+          <dt className="shrink-0 text-gray-500">ID</dt>
+          <dd className="flex flex-1 min-w-0 items-center justify-between gap-2">
+            <span className="font-mono text-xs text-gray-400 break-all">
+              {r.receipt.receipt_id}
+            </span>
+            <span className="flex shrink-0 items-center gap-1">
+              {isSuccess ? (
+                <CircleCheck className="size-3.5 text-green-600" />
+              ) : (
+                <CircleX className="size-3.5 text-red-600" />
+              )}
+            </span>
+          </dd>
+        </div>
         <div>
           <dt className="shrink-0 text-gray-500">Predecessor</dt>
           <dd>
@@ -104,20 +161,26 @@ function ReceiptCard({ r }: { r: ReceiptWithOutcome }) {
           <dt className="shrink-0 text-gray-500">Tokens Burnt</dt>
           <dd>{formatNear(outcome.tokens_burnt)}</dd>
         </div>
-        {actions.length > 0 && (
-          <div className="sm:col-span-2">
-            <dt className="shrink-0 text-gray-500">Actions</dt>
-            <dd className="flex flex-wrap gap-2 font-mono text-xs">
-              {actions.map((a, i) => (
-                <Action
-                  key={i}
-                  action={parseAction(a as Record<string, unknown>)}
-                />
-              ))}
-            </dd>
-          </div>
-        )}
       </dl>
+
+      {actions.length > 0 && (
+        <div className="border-t border-gray-100 px-4 py-2">
+          <p className="mb-1 text-xs font-medium text-gray-500">Actions</p>
+          <div className="space-y-2 font-mono text-xs">
+            {actions.map((a, i) => (
+              <ActionExpanded
+                key={i}
+                action={parseAction(a as Record<string, unknown>)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="border-t border-gray-100 px-4 py-2">
+        <p className="mb-1 text-xs font-medium text-gray-500">Result</p>
+        <ReceiptResult status={outcome.status} />
+      </div>
 
       {outcome.logs.length > 0 && (
         <div className="border-t border-gray-100 px-4 py-2">
@@ -170,41 +233,20 @@ export default function TxDetail() {
       <h1 className="mb-4 text-xl font-bold">Transaction</h1>
 
       <div className="mb-6 rounded-lg border border-gray-200 bg-white text-sm">
-        <dl className="grid gap-px sm:grid-cols-2 [&>div]:flex [&>div]:gap-2 [&>div]:border-b [&>div]:border-gray-100 [&>div]:px-4 [&>div]:py-3 [&>div:last-child]:border-b-0 [&>div:nth-last-child(2)]:sm:border-b-0">
+        <dl className="grid gap-px sm:grid-cols-2 [&>div]:flex [&>div]:items-center [&>div]:gap-2 [&>div]:border-b [&>div]:border-gray-100 [&>div]:px-4 [&>div]:py-2 [&>div:last-child]:border-b-0 [&>div:nth-last-child(2)]:sm:border-b-0">
           <div className="sm:col-span-2">
             <dt className="shrink-0 text-gray-500">Hash</dt>
-            <dd className="min-w-0 break-all">
-              <TransactionHash hash={tx.transaction.hash} truncate={false} />
-            </dd>
-          </div>
-          <div>
-            <dt className="shrink-0 text-gray-500">Status</dt>
-            <dd className="flex items-center gap-1">
-              {parsed.is_success ? (
-                <>
-                  <CircleCheck className="size-4 text-green-600" />
-                  <span className="text-green-600">Success</span>
-                </>
-              ) : (
-                <>
-                  <CircleX className="size-4 text-red-600" />
-                  <span className="text-red-600">Failure</span>
-                </>
-              )}
-            </dd>
-          </div>
-          <div>
-            <dt className="shrink-0 text-gray-500">Timestamp</dt>
-            <dd>
-              <TimeAgo
-                timestampNs={String(tx.execution_outcome.block_timestamp)}
-              />
-            </dd>
-          </div>
-          <div>
-            <dt className="shrink-0 text-gray-500">Block</dt>
-            <dd>
-              <BlockHeight height={tx.execution_outcome.block_height} />
+            <dd className="flex flex-1 min-w-0 items-center justify-between gap-2">
+              <span className="break-all">
+                <TransactionHash hash={tx.transaction.hash} truncate={false} />
+              </span>
+              <span className="flex shrink-0 items-center gap-1">
+                {parsed.is_success ? (
+                  <CircleCheck className="size-3.5 text-green-600" />
+                ) : (
+                  <CircleX className="size-3.5 text-red-600" />
+                )}
+              </span>
             </dd>
           </div>
           <div>
@@ -227,12 +269,18 @@ export default function TxDetail() {
               <AccountId accountId={parsed.receiver_id} />
             </dd>
           </div>
-          <div className="sm:col-span-2">
-            <dt className="shrink-0 text-gray-500">Actions</dt>
-            <dd className="flex flex-wrap gap-2 font-mono text-xs">
-              {parsed.actions.map((a, i) => (
-                <Action key={i} action={a} />
-              ))}
+          <div>
+            <dt className="shrink-0 text-gray-500">Block</dt>
+            <dd>
+              <BlockHeight height={tx.execution_outcome.block_height} />
+            </dd>
+          </div>
+          <div>
+            <dt className="shrink-0 text-gray-500">Time</dt>
+            <dd>
+              <TimeAgo
+                timestampNs={String(tx.execution_outcome.block_timestamp)}
+              />
             </dd>
           </div>
           <div>

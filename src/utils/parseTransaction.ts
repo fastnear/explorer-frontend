@@ -4,6 +4,8 @@ export interface ParsedAction {
   type: string;
   method_name?: string;
   deposit?: string;
+  args?: string;
+  gas?: number;
 }
 
 export interface ParsedTx {
@@ -26,6 +28,8 @@ export function parseAction(action: TransactionAction): ParsedAction {
     const v = value as Record<string, unknown>;
     if (typeof v.method_name === "string") result.method_name = v.method_name;
     if (typeof v.deposit === "string") result.deposit = v.deposit;
+    if (typeof v.args === "string") result.args = v.args;
+    if (typeof v.gas === "number") result.gas = v.gas;
   }
   return result;
 }
@@ -75,6 +79,10 @@ export function parseTransaction(tx: TransactionDetail): ParsedTx {
               result.method_name = a.method_name as string;
             if (typeof a.deposit === "string")
               result.deposit = a.deposit as string;
+            if (typeof a.args === "string")
+              result.args = a.args as string;
+            if (typeof a.gas === "number")
+              result.gas = a.gas as number;
             return result;
           }
           return parseAction(a);

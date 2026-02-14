@@ -6,10 +6,12 @@ import {
   UserMinus,
   FileCode,
   Coins,
+  Fuel,
   type LucideIcon,
 } from "lucide-react";
+import JsonView from "@uiw/react-json-view";
 import type { ParsedAction } from "../utils/parseTransaction";
-import { formatNear } from "../utils/format";
+import { formatNear, formatGas } from "../utils/format";
 
 const iconClass = "inline-block size-3.5 text-gray-400";
 
@@ -66,4 +68,68 @@ export default function Action({ action }: { action: ParsedAction }) {
     default:
       return <ActionGeneric action={action} />;
   }
+}
+
+function decodeArgs(args?: string): { json: unknown } | { raw: string } | null {
+  if (!args) return null;
+  try {
+    const decoded = atob(args);
+    try {
+      return { json: JSON.parse(decoded) };
+    } catch {
+      return { raw: decoded };
+    }
+  } catch {
+    return { raw: args };
+  }
+}
+
+function ArgsView({ args }: { args?: string }) {
+  const decoded = decodeArgs(args);
+  if (!decoded) return null;
+
+  if ("json" in decoded) {
+    return (
+      <div className="mt-1 overflow-auto rounded bg-gray-50 p-2 text-xs">
+        <JsonView value={decoded.json as object} collapsed={2} shortenTextAfterLength={512} displayDataTypes={false} />
+      </div>
+    );
+  }
+
+  const raw = decoded.raw;
+  return (
+    <div className="truncate text-xs text-gray-500" title={raw}>
+      {raw.length > 120 ? raw.slice(0, 120) + "..." : raw}
+    </div>
+  );
+}
+
+export function ActionExpanded({ action }: { action: ParsedAction }) {
+  if (action.type !== "FunctionCall") {
+    return <Action action={action} />;
+  }
+
+  return (
+    <div className="w-full text-sm space-y-1">
+      <div className="flex items-center gap-3">
+        <span className="flex items-center gap-1 font-medium">
+          <Code2 className={iconClass} />
+          <span>{action.method_name ?? "call"}</span>
+        </span>
+        {action.gas != null && (
+          <span className="flex items-center gap-1 text-xs text-gray-500">
+            <Fuel className="size-3 text-gray-400" />
+            {formatGas(action.gas)}
+          </span>
+        )}
+        {action.deposit && action.deposit !== "0" && (
+          <span className="flex items-center gap-1 text-xs text-gray-500">
+            <span className="text-gray-400">Ⓝ</span>
+            {formatNear(action.deposit)}
+          </span>
+        )}
+      </div>
+      <ArgsView args={action.args} />
+    </div>
+  );
 }

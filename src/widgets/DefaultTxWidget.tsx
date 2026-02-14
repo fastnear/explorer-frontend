@@ -2,16 +2,16 @@ import { useState } from "react";
 import type { TransactionDetail } from "../api/types";
 import { ChevronRight } from "lucide-react";
 import JsonView from "@uiw/react-json-view";
-import { lightTheme } from "@uiw/react-json-view/light";
+
 
 export default function DefaultTxWidget({ tx }: { tx: TransactionDetail }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 rounded-lg border border-gray-200 bg-white">
       <button
         onClick={() => setOpen(!open)}
-        className="flex cursor-pointer items-center gap-1 text-sm font-semibold text-gray-700 hover:text-gray-900"
+        className="flex w-full cursor-pointer items-center gap-1 px-4 py-3 text-sm font-semibold text-gray-700 hover:text-gray-900"
       >
         <ChevronRight
           className={`size-4 transition-transform ${open ? "rotate-90" : ""}`}
@@ -19,11 +19,11 @@ export default function DefaultTxWidget({ tx }: { tx: TransactionDetail }) {
         Raw Transaction Data
       </button>
       {open && (
-        <div className="mt-2 overflow-auto rounded-lg bg-gray-100 p-4 text-xs">
+        <div className="overflow-auto border-t border-gray-100 rounded-b-lg bg-gray-50 p-4 text-xs">
           <JsonView
             value={tx}
-            collapsed={1}
-            style={lightTheme}
+            collapsed={2}
+            shortenTextAfterLength={512}
             displayDataTypes={false}
           />
         </div>
