@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
-import { getBlock } from "../api/endpoints";
+import { Link, useParams } from "react-router-dom";
+import { getBlock, getBlocks } from "../api/endpoints";
 import type { BlockHeader, BlockTx } from "../api/types";
 import BlockHash from "../components/BlockHash";
+import BlockHeight from "../components/BlockHeight";
 import AccountId from "../components/AccountId";
+import TimeAgo from "../components/TimeAgo";
 import Pagination from "../components/Pagination";
 import useTxDetails from "../hooks/useTxDetails";
 import TxRow, { TxTableHeader } from "../components/TxRow";
+import { formatNear, formatGas } from "../utils/format";
 
 const PAGE_SIZE = 20;
 
@@ -16,14 +19,28 @@ export default function BlockDetail() {
   const [txs, setTxs] = useState<BlockTx[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
+  const [nextBlockHeight, setNextBlockHeight] = useState<number | null>(null);
 
   useEffect(() => {
     if (!blockId) return;
     setPage(0);
-    getBlock(Number(blockId), { with_transactions: true })
+    setNextBlockHeight(null);
+    getBlock(/^\d+$/.test(blockId) ? Number(blockId) : blockId, { with_transactions: true })
       .then((data) => {
         setBlock(data.block);
         setTxs(data.block_txs || []);
+        // Fire-and-forget: fetch next block without blocking UI
+        getBlocks({
+          from_block_height: data.block.block_height + 1,
+          desc: false,
+          limit: 1,
+        })
+          .then((res) => {
+            if (res.blocks.length > 0) {
+              setNextBlockHeight(res.blocks[0].block_height);
+            }
+          })
+          .catch(() => {});
       })
       .catch((err) => setError(String(err)));
   }, [blockId]);
@@ -57,34 +74,64 @@ export default function BlockDetail() {
   return (
     <div>
       <h1 className="mb-4 text-xl font-bold">
-        Block #{block.block_height.toLocaleString()}
+        Block #<Link to={`/block/${block.block_height}`} className="hover:underline">{block.block_height.toLocaleString()}</Link>
       </h1>
 
-      <div className="mb-6 grid gap-3 rounded-lg border border-gray-200 bg-white p-4 text-sm sm:grid-cols-2">
-        <div>
-          <span className="text-gray-500">Hash: </span>
-          <BlockHash hash={block.block_hash} />
-        </div>
-        <div>
-          <span className="text-gray-500">Timestamp: </span>
-          {new Date(Number(block.block_timestamp) / 1e6).toLocaleString()}
-        </div>
-        <div>
-          <span className="text-gray-500">Author: </span>
-          <AccountId accountId={block.author_id} />
-        </div>
-        <div>
-          <span className="text-gray-500">Gas Used: </span>
-          {(Number(block.gas_burnt) / 1e12).toFixed(2)} Tgas
-        </div>
-        <div>
-          <span className="text-gray-500">Gas Price: </span>
-          {block.gas_price}
-        </div>
-        <div>
-          <span className="text-gray-500">Transactions: </span>
-          {block.num_transactions}
-        </div>
+      <div className="mb-6 rounded-lg border border-gray-200 bg-white text-sm">
+        <dl className="grid gap-px sm:grid-cols-2 [&>div]:flex [&>div]:gap-2 [&>div]:border-b [&>div]:border-gray-100 [&>div]:px-4 [&>div]:py-3 [&>div:last-child]:border-b-0 [&>div:nth-last-child(2)]:sm:border-b-0">
+          <div>
+            <dt className="shrink-0 text-gray-500">Hash</dt>
+            <dd className="min-w-0 truncate"><BlockHash hash={block.block_hash} /></dd>
+          </div>
+          <div>
+            <dt className="shrink-0 text-gray-500">Timestamp</dt>
+            <dd><TimeAgo timestampNs={block.block_timestamp} /></dd>
+          </div>
+          <div>
+            <dt className="shrink-0 text-gray-500">Author</dt>
+            <dd><AccountId accountId={block.author_id} /></dd>
+          </div>
+          <div>
+            <dt className="shrink-0 text-gray-500">Prev Block</dt>
+            <dd><BlockHeight height={block.prev_block_height} /></dd>
+          </div>
+          <div>
+            <dt className="shrink-0 text-gray-500">Next Block</dt>
+            <dd>{nextBlockHeight ? <BlockHeight height={nextBlockHeight} /> : <span className="text-gray-400">—</span>}</dd>
+          </div>
+          <div>
+            <dt className="shrink-0 text-gray-500">Transactions</dt>
+            <dd>{block.num_transactions}</dd>
+          </div>
+          <div>
+            <dt className="shrink-0 text-gray-500">Receipts</dt>
+            <dd>{block.num_receipts}</dd>
+          </div>
+          <div>
+            <dt className="shrink-0 text-gray-500">Gas Used</dt>
+            <dd>{formatGas(Number(block.gas_burnt))}</dd>
+          </div>
+          <div>
+            <dt className="shrink-0 text-gray-500">Gas Price</dt>
+            <dd>{formatNear(block.gas_price)}</dd>
+          </div>
+          <div>
+            <dt className="shrink-0 text-gray-500">Tokens Burnt</dt>
+            <dd>{formatNear(block.tokens_burnt)}</dd>
+          </div>
+          <div>
+            <dt className="shrink-0 text-gray-500">Chunks</dt>
+            <dd>{block.chunks_included}</dd>
+          </div>
+          <div>
+            <dt className="shrink-0 text-gray-500">Protocol Version</dt>
+            <dd>{block.protocol_version}</dd>
+          </div>
+          <div>
+            <dt className="shrink-0 text-gray-500">Epoch ID</dt>
+            <dd className="min-w-0 truncate font-mono text-xs">{block.epoch_id}</dd>
+          </div>
+        </dl>
       </div>
 
       {txs.length > 0 && (

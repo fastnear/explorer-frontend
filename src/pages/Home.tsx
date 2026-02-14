@@ -5,7 +5,7 @@ import usePagedCache from "../hooks/usePagedCache";
 import BlockHeight from "../components/BlockHeight";
 import AccountId from "../components/AccountId";
 import Pagination from "../components/Pagination";
-import { timeAgo } from "../utils/time";
+import TimeAgo from "../components/TimeAgo";
 
 const PAGE_SIZE = 20;
 
@@ -79,7 +79,7 @@ export default function Home() {
                   </span>
                 </td>
                 <td className="px-4 py-3 text-gray-500">
-                  {timeAgo(b.block_timestamp)}
+                  <TimeAgo timestampNs={b.block_timestamp} />
                 </td>
                 <td className="px-4 py-3">
                   <AccountId accountId={b.author_id} />

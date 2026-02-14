@@ -1,10 +1,38 @@
+import { useState } from "react";
 import type { ParsedTx } from "../utils/parseTransaction";
+import type { ParsedAction } from "../utils/parseTransaction";
 import { formatGas } from "../utils/format";
-import { timeAgo } from "../utils/time";
 import TransactionHash from "./TransactionHash";
+import TimeAgo from "./TimeAgo";
 import AccountId from "./AccountId";
 import Action from "./Action";
 import { CircleCheck, CircleX } from "lucide-react";
+
+const ACTIONS_LIMIT = 3;
+
+function ActionList({ actions }: { actions: ParsedAction[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const showAll = expanded || actions.length <= ACTIONS_LIMIT;
+  const visible = showAll ? actions : actions.slice(0, ACTIONS_LIMIT);
+
+  return (
+    <>
+      {visible.map((a, i) => (
+        <div key={i}>
+          <Action action={a} />
+        </div>
+      ))}
+      {!showAll && (
+        <button
+          onClick={() => setExpanded(true)}
+          className="cursor-pointer text-blue-600 hover:text-blue-800"
+        >
+          + {actions.length - ACTIONS_LIMIT} more...
+        </button>
+      )}
+    </>
+  );
+}
 
 interface TxRowProps {
   tx: ParsedTx;
@@ -35,7 +63,7 @@ export default function TxRow({ tx, timestamp }: TxRowProps) {
         <TransactionHash hash={tx.hash} />
       </td>
       <td className="whitespace-nowrap px-4 py-3 text-gray-500">
-        {timeAgo(timestamp)}
+        <TimeAgo timestampNs={timestamp} />
       </td>
       <td className="px-4 py-3">
         <AccountId accountId={tx.signer_id} />
@@ -44,11 +72,7 @@ export default function TxRow({ tx, timestamp }: TxRowProps) {
         <AccountId accountId={tx.receiver_id} />
       </td>
       <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">
-        {tx.actions.map((a, i) => (
-          <div key={i}>
-            <Action action={a} />
-          </div>
-        ))}
+        <ActionList actions={tx.actions} />
       </td>
       <td className="whitespace-nowrap px-4 py-3 text-xs">
         {formatGas(tx.gas_burnt)}

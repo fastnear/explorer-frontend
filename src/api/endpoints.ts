@@ -7,13 +7,13 @@ import type {
 } from "./types";
 
 export function getBlocks(
-  params: { limit?: number; desc?: boolean; to_block_height?: number } = {}
+  params: { limit?: number; desc?: boolean; to_block_height?: number; from_block_height?: number } = {}
 ): Promise<BlocksResponse> {
   return fetchApi<BlocksResponse>("blocks", params);
 }
 
 export function getBlock(
-  blockId: number,
+  blockId: string | number,
   opts: { with_transactions?: boolean } = {}
 ): Promise<BlockDetailResponse> {
   return fetchApi<BlockDetailResponse>("block", { block_id: blockId, ...opts });
