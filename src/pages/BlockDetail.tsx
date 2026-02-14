@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getBlock } from "../api/endpoints";
 import type { BlockHeader, BlockTx } from "../api/types";
 import BlockHash from "../components/BlockHash";
 import AccountId from "../components/AccountId";
-import TransactionHash from "../components/TransactionHash";
+import useTxDetails from "../hooks/useTxDetails";
+import TxRow, { TxTableHeader } from "../components/TxRow";
 
 export default function BlockDetail() {
   const { blockId } = useParams<{ blockId: string }>();
@@ -21,6 +22,9 @@ export default function BlockDetail() {
       })
       .catch((err) => setError(String(err)));
   }, [blockId]);
+
+  const hashes = useMemo(() => txs.map((t) => t.transaction_hash), [txs]);
+  const { txMap, loading: detailsLoading } = useTxDetails(hashes);
 
   if (error) return <p className="text-red-600">{error}</p>;
   if (!block) return <p className="text-gray-500">Loading block...</p>;
@@ -61,45 +65,27 @@ export default function BlockDetail() {
       {txs.length > 0 && (
         <>
           <h2 className="mb-3 text-lg font-semibold">Transactions</h2>
-          <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+          <div className="min-w-fit rounded-lg border border-gray-200 bg-white">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium uppercase text-gray-500">
-                  <th className="px-4 py-3">Hash</th>
-                  <th className="px-4 py-3">Signer</th>
-                  <th className="px-4 py-3">Receiver</th>
-                  <th className="px-4 py-3">Status</th>
-                </tr>
-              </thead>
+              <TxTableHeader />
               <tbody>
-                {txs.map((tx) => (
-                  <tr
-                    key={tx.transaction_hash}
-                    className="border-b border-gray-100 hover:bg-gray-50"
-                  >
-                    <td className="px-4 py-3">
-                      <TransactionHash hash={tx.transaction_hash} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <AccountId accountId={tx.signer_id} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <AccountId accountId={tx.receiver_id} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={
-                          tx.is_success ? "text-green-600" : "text-red-600"
-                        }
-                      >
-                        {tx.is_success ? "Success" : "Failed"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {txs.map((btx) => {
+                  const parsed = txMap.get(btx.transaction_hash);
+                  if (!parsed) return null;
+                  return (
+                    <TxRow
+                      key={btx.transaction_hash}
+                      tx={parsed}
+                      timestamp={btx.tx_block_timestamp}
+                    />
+                  );
+                })}
               </tbody>
             </table>
           </div>
+          {detailsLoading && (
+            <p className="mt-4 text-gray-500">Loading transaction details...</p>
+          )}
         </>
       )}
     </div>

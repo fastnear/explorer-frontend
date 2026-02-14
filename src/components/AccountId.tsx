@@ -23,7 +23,7 @@ export default function AccountId({
     return (
       <Link
         to={`/account/${accountId}`}
-        className="font-mono text-xs text-blue-600 hover:underline"
+        className="whitespace-nowrap font-mono text-xs text-blue-600 hover:underline"
         title={title}
       >
         {display}
@@ -32,7 +32,7 @@ export default function AccountId({
   }
 
   return (
-    <span className="font-mono text-xs" title={title}>
+    <span className="whitespace-nowrap font-mono text-xs" title={title}>
       {display}
     </span>
   );
