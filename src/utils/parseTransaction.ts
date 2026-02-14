@@ -18,7 +18,7 @@ export interface ParsedTx {
   relayer_id?: string;
 }
 
-function parseAction(action: TransactionAction): ParsedAction {
+export function parseAction(action: TransactionAction): ParsedAction {
   const type = Object.keys(action)[0];
   const value = action[type];
   const result: ParsedAction = { type };
