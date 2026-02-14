@@ -6,7 +6,8 @@ import TransactionHash from "./TransactionHash";
 import TimeAgo from "./TimeAgo";
 import AccountId from "./AccountId";
 import Action from "./Action";
-import { CircleCheck, CircleX } from "lucide-react";
+import { CircleCheck, CircleX, Radio } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const ACTIONS_LIMIT = 3;
 
@@ -66,7 +67,17 @@ export default function TxRow({ tx, timestamp }: TxRowProps) {
         <TimeAgo timestampNs={timestamp} />
       </td>
       <td className="px-4 py-3">
-        <AccountId accountId={tx.signer_id} />
+        <span className="inline-flex items-center gap-1">
+          {tx.relayer_id && (
+            <Link
+              to={`/account/${tx.relayer_id}`}
+              title={`Relayed by ${tx.relayer_id}`}
+            >
+              <Radio className="size-3.5 text-red-500" />
+            </Link>
+          )}
+          <AccountId accountId={tx.signer_id} />
+        </span>
       </td>
       <td className="px-4 py-3">
         <AccountId accountId={tx.receiver_id} />

@@ -15,6 +15,7 @@ export interface ParsedTx {
   gas_burnt: number;
   is_success: boolean;
   actions: ParsedAction[];
+  relayer_id?: string;
 }
 
 function parseAction(action: TransactionAction): ParsedAction {
@@ -38,7 +39,8 @@ export function parseTransaction(tx: TransactionDetail): ParsedTx {
     totalGas += r.execution_outcome.outcome.gas_burnt;
   }
 
-  return {
+  const actions = tx.transaction.actions;
+  const parsed: ParsedTx = {
     hash: tx.transaction.hash,
     signer_id: tx.transaction.signer_id,
     receiver_id: tx.transaction.receiver_id,
@@ -46,6 +48,40 @@ export function parseTransaction(tx: TransactionDetail): ParsedTx {
     timestamp: String(tx.execution_outcome.block_timestamp),
     gas_burnt: totalGas,
     is_success,
-    actions: tx.transaction.actions.map(parseAction),
+    actions: actions.map(parseAction),
   };
+
+  // Detect Delegate: first action is Delegate wrapping the real signer/receiver
+  if (actions.length === 1 && actions[0].Delegate) {
+    const delegate = actions[0].Delegate as Record<string, unknown>;
+    const delegateAction = (delegate.delegate_action ?? delegate) as Record<
+      string,
+      unknown
+    >;
+    if (typeof delegateAction.sender_id === "string") {
+      parsed.relayer_id = tx.transaction.signer_id;
+      parsed.signer_id = delegateAction.sender_id;
+      if (typeof delegateAction.receiver_id === "string") {
+        parsed.receiver_id = delegateAction.receiver_id;
+      }
+      const innerActions = delegateAction.actions;
+      if (Array.isArray(innerActions)) {
+        parsed.actions = innerActions.map((a: TransactionAction) => {
+          // Inner actions may be wrapped as { type: "FunctionCall", ... }
+          // or as { FunctionCall: { ... } } like top-level actions
+          if (typeof a.type === "string" && a.type !== "object") {
+            const result: ParsedAction = { type: a.type as string };
+            if (typeof a.method_name === "string")
+              result.method_name = a.method_name as string;
+            if (typeof a.deposit === "string")
+              result.deposit = a.deposit as string;
+            return result;
+          }
+          return parseAction(a);
+        });
+      }
+    }
+  }
+
+  return parsed;
 }

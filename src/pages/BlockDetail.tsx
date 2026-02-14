@@ -92,6 +92,10 @@ export default function BlockDetail() {
             <dd><AccountId accountId={block.author_id} /></dd>
           </div>
           <div>
+            <dt className="shrink-0 text-gray-500">Epoch ID</dt>
+            <dd className="min-w-0 truncate font-mono text-xs">{block.epoch_id}</dd>
+          </div>
+          <div>
             <dt className="shrink-0 text-gray-500">Prev Block</dt>
             <dd><BlockHeight height={block.prev_block_height} /></dd>
           </div>
@@ -126,10 +130,6 @@ export default function BlockDetail() {
           <div>
             <dt className="shrink-0 text-gray-500">Protocol Version</dt>
             <dd>{block.protocol_version}</dd>
-          </div>
-          <div>
-            <dt className="shrink-0 text-gray-500">Epoch ID</dt>
-            <dd className="min-w-0 truncate font-mono text-xs">{block.epoch_id}</dd>
           </div>
         </dl>
       </div>
