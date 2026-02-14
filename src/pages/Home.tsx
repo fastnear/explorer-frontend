@@ -3,16 +3,7 @@ import { getBlocks } from "../api/endpoints";
 import type { BlockHeader } from "../api/types";
 import BlockHeight from "../components/BlockHeight";
 import AccountId from "../components/AccountId";
-
-function timeAgo(timestampNs: string): string {
-  const seconds = Math.floor((Date.now() - Number(timestampNs) / 1e6) / 1000);
-  if (seconds < 60) return `${seconds}s ago`;
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
-}
+import { timeAgo } from "../utils/time";
 
 export default function Home() {
   const [blocks, setBlocks] = useState<BlockHeader[]>([]);
