@@ -1,31 +1,52 @@
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
 import { getBlocks } from "../api/endpoints";
 import type { BlockHeader } from "../api/types";
+import usePagedCache from "../hooks/usePagedCache";
 import BlockHeight from "../components/BlockHeight";
 import AccountId from "../components/AccountId";
+import Pagination from "../components/Pagination";
 import { timeAgo } from "../utils/time";
 
+const PAGE_SIZE = 20;
+
 export default function Home() {
-  const [blocks, setBlocks] = useState<BlockHeader[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-
-    async function load() {
-      try {
-        const data = await getBlocks({ limit: 20, desc: true });
-        if (active) setBlocks(data.blocks);
-      } catch (err) {
-        if (active) setError(String(err));
+  const fetchPage = useCallback(
+    async (resumeToken?: string, limit?: number) => {
+      const data = await getBlocks({
+        limit: limit ?? PAGE_SIZE,
+        desc: true,
+        to_block_height: resumeToken ? Number(resumeToken) : undefined,
+      });
+      const blocks = data.blocks;
+      let nextToken: string | undefined;
+      if (blocks.length > 0) {
+        const lowestHeight = blocks[blocks.length - 1].block_height;
+        nextToken = String(lowestHeight - 1);
       }
-    }
+      return {
+        items: blocks,
+        resumeToken: nextToken,
+        totalCount: 0,
+      };
+    },
+    []
+  );
 
-    load();
-    return () => {
-      active = false;
-    };
-  }, []);
+  const {
+    items: blocks,
+    currentPage,
+    hasNext,
+    hasPrev,
+    goFirst,
+    goNext,
+    goPrev,
+    loading,
+    error,
+  } = usePagedCache<BlockHeader>({
+    fetchPage,
+    pageSize: PAGE_SIZE,
+    key: "blocks",
+  });
 
   if (error) {
     return <p className="text-red-600">Error loading blocks: {error}</p>;
@@ -73,6 +94,15 @@ export default function Home() {
           </tbody>
         </table>
       </div>
+      <Pagination
+        currentPage={currentPage}
+        hasNext={hasNext}
+        hasPrev={hasPrev}
+        goFirst={goFirst}
+        goPrev={goPrev}
+        goNext={goNext}
+        nextBusy={loading}
+      />
     </div>
   );
 }

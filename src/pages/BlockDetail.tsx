@@ -1,20 +1,25 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getBlock } from "../api/endpoints";
 import type { BlockHeader, BlockTx } from "../api/types";
 import BlockHash from "../components/BlockHash";
 import AccountId from "../components/AccountId";
+import Pagination from "../components/Pagination";
 import useTxDetails from "../hooks/useTxDetails";
 import TxRow, { TxTableHeader } from "../components/TxRow";
+
+const PAGE_SIZE = 20;
 
 export default function BlockDetail() {
   const { blockId } = useParams<{ blockId: string }>();
   const [block, setBlock] = useState<BlockHeader | null>(null);
   const [txs, setTxs] = useState<BlockTx[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     if (!blockId) return;
+    setPage(0);
     getBlock(Number(blockId), { with_transactions: true })
       .then((data) => {
         setBlock(data.block);
@@ -23,8 +28,28 @@ export default function BlockDetail() {
       .catch((err) => setError(String(err)));
   }, [blockId]);
 
-  const hashes = useMemo(() => txs.map((t) => t.transaction_hash), [txs]);
-  const { txMap, loading: detailsLoading } = useTxDetails(hashes);
+  const totalPages = Math.ceil(txs.length / PAGE_SIZE);
+  const hasNext = page < totalPages - 1;
+  const hasPrev = page > 0;
+
+  const goFirst = useCallback(() => setPage(0), []);
+  const goPrev = useCallback(() => setPage((p) => Math.max(0, p - 1)), []);
+  const goNext = useCallback(
+    () => setPage((p) => Math.min(totalPages - 1, p + 1)),
+    [totalPages]
+  );
+
+  const pageTxs = useMemo(
+    () => txs.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE),
+    [txs, page]
+  );
+
+  // Fetch details for current page + one page ahead for preloading
+  const visibleHashes = useMemo(
+    () => txs.slice(page * PAGE_SIZE, (page + 2) * PAGE_SIZE).map((t) => t.transaction_hash),
+    [txs, page]
+  );
+  const { txMap } = useTxDetails(visibleHashes);
 
   if (error) return <p className="text-red-600">{error}</p>;
   if (!block) return <p className="text-gray-500">Loading block...</p>;
@@ -69,7 +94,7 @@ export default function BlockDetail() {
             <table className="w-full text-sm">
               <TxTableHeader />
               <tbody>
-                {txs.map((btx) => {
+                {pageTxs.map((btx) => {
                   const parsed = txMap.get(btx.transaction_hash);
                   if (!parsed) return null;
                   return (
@@ -83,9 +108,14 @@ export default function BlockDetail() {
               </tbody>
             </table>
           </div>
-          {detailsLoading && (
-            <p className="mt-4 text-gray-500">Loading transaction details...</p>
-          )}
+          <Pagination
+            currentPage={page}
+            hasNext={hasNext}
+            hasPrev={hasPrev}
+            goFirst={goFirst}
+            goPrev={goPrev}
+            goNext={goNext}
+          />
         </>
       )}
     </div>

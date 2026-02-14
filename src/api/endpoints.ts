@@ -7,7 +7,7 @@ import type {
 } from "./types";
 
 export function getBlocks(
-  params: { limit?: number; desc?: boolean } = {}
+  params: { limit?: number; desc?: boolean; to_block_height?: number } = {}
 ): Promise<BlocksResponse> {
   return fetchApi<BlocksResponse>("blocks", params);
 }

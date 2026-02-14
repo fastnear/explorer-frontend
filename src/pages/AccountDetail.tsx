@@ -5,11 +5,7 @@ import type { AccountTx } from "../api/types";
 import useTxDetails from "../hooks/useTxDetails";
 import usePagedCache from "../hooks/usePagedCache";
 import TxRow, { TxTableHeader } from "../components/TxRow";
-import { Loader2 } from "lucide-react";
-
-function Spinner() {
-  return <Loader2 className="size-4 animate-spin" />;
-}
+import Pagination from "../components/Pagination";
 
 const PAGE_SIZE = 20;
 
@@ -102,35 +98,15 @@ export default function AccountDetail() {
         </table>
       </div>
 
-      {(hasNext || hasPrev) && (
-        <div className="mt-4 flex items-center gap-4">
-          <button
-            onClick={goFirst}
-            disabled={!hasPrev}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
-          >
-            First
-          </button>
-          <button
-            onClick={goPrev}
-            disabled={!hasPrev}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
-          >
-            Prev
-          </button>
-          <span className="text-sm text-gray-600">
-            Page {currentPage + 1}
-          </span>
-          <button
-            onClick={goNext}
-            disabled={!hasNext || nextBusy}
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
-          >
-            Next
-            {nextBusy && hasNext && <Spinner />}
-          </button>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        hasNext={hasNext}
+        hasPrev={hasPrev}
+        goFirst={goFirst}
+        goPrev={goPrev}
+        goNext={goNext}
+        nextBusy={nextBusy}
+      />
     </div>
   );
 }
