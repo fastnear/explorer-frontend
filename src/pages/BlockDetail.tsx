@@ -98,7 +98,7 @@ export default function BlockDetail() {
           </div>
           <div>
             <dt className="shrink-0 text-gray-500">Prev Block</dt>
-            <dd><BlockHeight height={block.prev_block_height} /></dd>
+            <dd>{block.prev_block_height != null ? <BlockHeight height={block.prev_block_height} /> : <BlockHash hash={block.prev_block_hash} />}</dd>
           </div>
           <div>
             <dt className="shrink-0 text-gray-500">Next Block</dt>

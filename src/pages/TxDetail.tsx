@@ -11,6 +11,7 @@ import AccountId from "../components/AccountId";
 import BlockHeight from "../components/BlockHeight";
 import TimeAgo from "../components/TimeAgo";
 import { ActionExpanded } from "../components/Action";
+import Base64Data from "../components/Base64Data";
 import JsonView from "@uiw/react-json-view";
 import { CircleCheck, CircleX, Radio } from "lucide-react";
 
@@ -40,10 +41,11 @@ function EventLog({ log }: { log: string }) {
   }
 }
 
+
 function ReceiptResult({ status }: { status: Record<string, unknown> }) {
   if ("SuccessReceiptId" in status) {
     return (
-      <div className="rounded bg-gray-50 p-2 font-mono text-xs break-all">
+      <div className="overflow-auto rounded border border-gray-200 bg-gray-50 p-2 text-xs font-mono break-all">
         Receipt:{" "}
         <a href={`#receipt-${String(status.SuccessReceiptId)}`} className="text-blue-600 hover:underline">
           {String(status.SuccessReceiptId)}
@@ -52,49 +54,11 @@ function ReceiptResult({ status }: { status: Record<string, unknown> }) {
     );
   }
   if ("SuccessValue" in status) {
-    const raw = String(status.SuccessValue);
-    if (!raw) {
-      return (
-        <div className="rounded bg-gray-50 p-2 font-mono text-xs text-gray-500">
-          Empty result
-        </div>
-      );
-    }
-    try {
-      const decoded = atob(raw);
-      try {
-        const json = JSON.parse(decoded);
-        if (typeof json === "object" && json !== null) {
-          return (
-            <div className="overflow-auto rounded bg-gray-50 p-2 text-xs">
-              <JsonView value={json} collapsed={2} displayDataTypes={false} shortenTextAfterLength={512} />
-            </div>
-          );
-        }
-        const serialized = JSON.stringify(json);
-        return (
-          <div className="rounded bg-gray-50 p-2 font-mono text-xs break-all">
-            {serialized.length > 512 ? serialized.slice(0, 512) + "..." : serialized}
-          </div>
-        );
-      } catch {
-        return (
-          <div className="rounded bg-gray-50 p-2 font-mono text-xs break-all">
-            {decoded.length > 512 ? decoded.slice(0, 512) + "..." : decoded}
-          </div>
-        );
-      }
-    } catch {
-      return (
-        <div className="rounded bg-gray-50 p-2 font-mono text-xs break-all">
-          {raw.length > 512 ? raw.slice(0, 512) + "..." : raw}
-        </div>
-      );
-    }
+    return <Base64Data base64={String(status.SuccessValue)} />;
   }
   if ("Failure" in status) {
     return (
-      <div className="overflow-auto rounded bg-red-50 p-2 text-xs text-red-700">
+      <div className="overflow-auto rounded border border-gray-200 bg-red-50 p-2 text-xs text-red-700">
         <JsonView value={status.Failure as object} collapsed={2} displayDataTypes={false} />
       </div>
     );

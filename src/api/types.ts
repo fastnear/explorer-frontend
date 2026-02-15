@@ -3,9 +3,9 @@ export interface BlockHeader {
   block_height: number;
   block_hash: string;
   prev_block_hash: string;
-  prev_block_height: number;
+  prev_block_height: number | null;
   block_timestamp: string;
-  block_ordinal: number;
+  block_ordinal: number | null;
   gas_price: string;
   gas_burnt: string;
   total_supply: string;

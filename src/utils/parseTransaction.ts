@@ -1,4 +1,5 @@
 import type { TransactionDetail, TransactionAction } from "../api/types";
+import { encodeBase58 } from "./format";
 
 export interface ParsedAction {
   type: string;
@@ -6,6 +7,10 @@ export interface ParsedAction {
   deposit?: string;
   args?: string;
   gas?: number;
+  public_key?: string;
+  access_key_permission?: string;
+  beneficiary_id?: string;
+  code_hash?: string;
 }
 
 export interface ParsedTx {
@@ -21,6 +26,10 @@ export interface ParsedTx {
 }
 
 export function parseAction(action: TransactionAction): ParsedAction {
+  // Actions can be plain strings (e.g. "CreateAccount") or objects (e.g. { Transfer: { deposit: "..." } })
+  if (typeof action === "string") {
+    return { type: action };
+  }
   const type = Object.keys(action)[0];
   const value = action[type];
   const result: ParsedAction = { type };
@@ -30,6 +39,24 @@ export function parseAction(action: TransactionAction): ParsedAction {
     if (typeof v.deposit === "string") result.deposit = v.deposit;
     if (typeof v.args === "string") result.args = v.args;
     if (typeof v.gas === "number") result.gas = v.gas;
+    if (typeof v.public_key === "string") result.public_key = v.public_key;
+    if (typeof v.beneficiary_id === "string") result.beneficiary_id = v.beneficiary_id;
+    if (typeof v.code === "string") {
+      const bytes = Uint8Array.from(atob(v.code), (c) => c.charCodeAt(0));
+      result.code_hash = encodeBase58(bytes);
+    }
+    if (v.access_key && typeof v.access_key === "object") {
+      const ak = v.access_key as Record<string, unknown>;
+      if (ak.permission === "FullAccess") {
+        result.access_key_permission = "FullAccess";
+      } else if (ak.permission && typeof ak.permission === "object") {
+        const perm = ak.permission as Record<string, unknown>;
+        if (perm.FunctionCall && typeof perm.FunctionCall === "object") {
+          const fc = perm.FunctionCall as Record<string, unknown>;
+          result.access_key_permission = `FunctionCall → ${fc.receiver_id ?? "?"}`;
+        }
+      }
+    }
   }
   return result;
 }

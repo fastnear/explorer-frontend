@@ -13,3 +13,35 @@ export function formatNear(yoctoNear: string | undefined): string {
 export function formatGas(gas: number): string {
   return `${(gas / 1e12).toFixed(2)} Tgas`;
 }
+
+const BASE58_ALPHABET =
+  "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+export function encodeBase58(bytes: Uint8Array): string {
+  // Count leading zeros
+  let zeros = 0;
+  while (zeros < bytes.length && bytes[zeros] === 0) zeros++;
+
+  // Convert to base58
+  const digits: number[] = [];
+  for (let i = zeros; i < bytes.length; i++) {
+    let carry = bytes[i];
+    for (let j = 0; j < digits.length; j++) {
+      carry += digits[j] << 8;
+      digits[j] = carry % 58;
+      carry = (carry / 58) | 0;
+    }
+    while (carry > 0) {
+      digits.push(carry % 58);
+      carry = (carry / 58) | 0;
+    }
+  }
+
+  return (
+    BASE58_ALPHABET[0].repeat(zeros) +
+    digits
+      .reverse()
+      .map((d) => BASE58_ALPHABET[d])
+      .join("")
+  );
+}

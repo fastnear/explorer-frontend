@@ -9,8 +9,9 @@ import {
   Fuel,
   type LucideIcon,
 } from "lucide-react";
-import JsonView from "@uiw/react-json-view";
 import type { ParsedAction } from "../utils/parseTransaction";
+import AccountId from "./AccountId";
+import Base64Data from "./Base64Data";
 import GasAmount from "./GasAmount";
 import NearAmount from "./NearAmount";
 
@@ -71,43 +72,65 @@ export default function Action({ action }: { action: ParsedAction }) {
   }
 }
 
-function decodeArgs(args?: string): { json: unknown } | { raw: string } | null {
-  if (!args) return null;
-  try {
-    const decoded = atob(args);
-    try {
-      return { json: JSON.parse(decoded) };
-    } catch {
-      return { raw: decoded };
-    }
-  } catch {
-    return { raw: args };
-  }
+function ActionKeyExpanded({ action }: { action: ParsedAction }) {
+  return (
+    <div className="w-full text-sm space-y-1">
+      <span className="flex items-center gap-1 font-medium">
+        <Key className={iconClass} />
+        <span>{action.type}</span>
+        {action.access_key_permission && (
+          <span className="font-normal text-gray-500">({action.access_key_permission})</span>
+        )}
+      </span>
+      {action.public_key && (
+        <div className="font-mono text-xs text-gray-400 break-all">{action.public_key}</div>
+      )}
+    </div>
+  );
 }
 
-function ArgsView({ args }: { args?: string }) {
-  const decoded = decodeArgs(args);
-  if (!decoded) return null;
-
-  if ("json" in decoded) {
-    return (
-      <div className="mt-1 overflow-auto rounded bg-gray-50 p-2 text-xs">
-        <JsonView value={decoded.json as object} collapsed={2} shortenTextAfterLength={512} displayDataTypes={false} />
-      </div>
-    );
-  }
-
-  const raw = decoded.raw;
+function ActionDeployContractExpanded({ action }: { action: ParsedAction }) {
   return (
-    <div className="truncate text-xs text-gray-500" title={raw}>
-      {raw.length > 120 ? raw.slice(0, 120) + "..." : raw}
+    <div className="w-full text-sm space-y-1">
+      <span className="flex items-center gap-1 font-medium">
+        <FileCode className={iconClass} />
+        <span>DeployContract</span>
+      </span>
+      {action.code_hash && (
+        <div className="font-mono text-xs text-gray-400 break-all">{action.code_hash}</div>
+      )}
+    </div>
+  );
+}
+
+function ActionDeleteAccountExpanded({ action }: { action: ParsedAction }) {
+  return (
+    <div className="w-full text-sm space-y-1">
+      <span className="flex items-center gap-1 font-medium">
+        <UserMinus className={iconClass} />
+        <span>DeleteAccount</span>
+      </span>
+      {action.beneficiary_id && (
+        <div className="text-xs text-gray-500">
+          Beneficiary: <AccountId accountId={action.beneficiary_id} />
+        </div>
+      )}
     </div>
   );
 }
 
 export function ActionExpanded({ action }: { action: ParsedAction }) {
+  if (action.type === "AddKey" || action.type === "DeleteKey") {
+    return <ActionKeyExpanded action={action} />;
+  }
+  if (action.type === "DeleteAccount") {
+    return <ActionDeleteAccountExpanded action={action} />;
+  }
+  if (action.type === "DeployContract") {
+    return <ActionDeployContractExpanded action={action} />;
+  }
   if (action.type !== "FunctionCall") {
-    return <Action action={action} />;
+    return <div><Action action={action} /></div>;
   }
 
   return (
@@ -129,7 +152,7 @@ export function ActionExpanded({ action }: { action: ParsedAction }) {
           </span>
         )}
       </div>
-      <ArgsView args={action.args} />
+      {action.args && <Base64Data base64={action.args} />}
     </div>
   );
 }
