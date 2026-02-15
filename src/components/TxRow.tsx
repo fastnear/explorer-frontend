@@ -35,7 +35,7 @@ function ActionList({ actions }: { actions: ParsedAction[] }) {
   );
 }
 
-interface TxRowProps {
+export interface TxTableItem {
   tx: ParsedTx;
   timestamp: string;
 }
@@ -57,7 +57,7 @@ export function TxTableHeader() {
   );
 }
 
-export default function TxRow({ tx, timestamp }: TxRowProps) {
+export default function TxRow({ tx, timestamp }: TxTableItem) {
   return (
     <tr className="border-b border-gray-100 hover:bg-gray-50">
       <td className="whitespace-nowrap px-4 py-3">
@@ -96,5 +96,80 @@ export default function TxRow({ tx, timestamp }: TxRowProps) {
         )}
       </td>
     </tr>
+  );
+}
+
+function TxMobileCard({ tx, timestamp }: TxTableItem) {
+  return (
+    <div className="px-3 py-2.5">
+      <div className="flex items-center justify-between gap-2 mb-1">
+        <div className="flex items-center gap-1.5 min-w-0">
+          {tx.is_success ? (
+            <CircleCheck className="size-3.5 text-green-600 shrink-0" />
+          ) : (
+            <CircleX className="size-3.5 text-red-600 shrink-0" />
+          )}
+          <span className="font-mono text-xs truncate">
+            <ActionList actions={tx.actions} />
+          </span>
+        </div>
+        <span className="text-xs text-gray-500 shrink-0">
+          <TimeAgo timestampNs={timestamp} />
+        </span>
+      </div>
+      <div className="mb-1 text-sm">
+        <TransactionHash hash={tx.hash} />
+      </div>
+      <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-sm">
+        <span className="inline-flex items-center gap-1">
+          {tx.relayer_id && (
+            <Link
+              to={`/account/${tx.relayer_id}`}
+              title={`Relayed by ${tx.relayer_id}`}
+            >
+              <Radio className="size-3 text-red-500" />
+            </Link>
+          )}
+          <AccountId accountId={tx.signer_id} />
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="text-gray-400">→</span>
+          <AccountId accountId={tx.receiver_id} />
+        </span>
+      </div>
+      <div className="text-xs text-gray-500 mt-0.5">
+        <GasAmount gas={tx.gas_burnt} />
+      </div>
+    </div>
+  );
+}
+
+export function TxTable({ items }: { items: TxTableItem[] }) {
+  return (
+    <>
+      <div className="hidden sm:block min-w-fit rounded-lg border border-gray-200 bg-surface">
+        <table className="w-full text-sm">
+          <TxTableHeader />
+          <tbody>
+            {items.map((item, i) => (
+              <TxRow
+                key={`${item.tx.hash}-${i}`}
+                tx={item.tx}
+                timestamp={item.timestamp}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="sm:hidden rounded-lg border border-gray-200 bg-surface divide-y divide-gray-100">
+        {items.map((item, i) => (
+          <TxMobileCard
+            key={`${item.tx.hash}-${i}`}
+            tx={item.tx}
+            timestamp={item.timestamp}
+          />
+        ))}
+      </div>
+    </>
   );
 }

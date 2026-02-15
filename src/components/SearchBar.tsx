@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { Search } from "lucide-react";
 import { networkId, otherNetworkUrl } from "../config";
 import { decodeBase58 } from "../utils/format";
 
@@ -50,7 +51,7 @@ export default function SearchBar() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by tx hash, block height, or account ID"
+          placeholder="Search tx, block, or account"
           className="w-full rounded-lg border border-gray-300 bg-surface px-4 py-2 pr-20 text-sm focus:border-blue-500 focus:outline-none"
         />
         {type && (
@@ -61,9 +62,10 @@ export default function SearchBar() {
       </div>
       <button
         type="submit"
-        className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        className="rounded-lg bg-blue-600 px-3 py-2 sm:px-4 text-sm font-medium text-white hover:bg-blue-700"
       >
-        Search
+        <Search className="size-4 sm:hidden" />
+        <span className="hidden sm:inline">Search</span>
       </button>
     </form>
   );

@@ -55,7 +55,8 @@ export default function Home() {
   return (
     <div>
       <h1 className="mb-4 text-xl font-bold">Latest Blocks</h1>
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-surface">
+      {/* Desktop table */}
+      <div className="hidden sm:block overflow-x-auto rounded-lg border border-gray-200 bg-surface">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium uppercase text-gray-500">
@@ -93,6 +94,25 @@ export default function Home() {
             ))}
           </tbody>
         </table>
+      </div>
+      {/* Mobile cards */}
+      <div className="sm:hidden rounded-lg border border-gray-200 bg-surface divide-y divide-gray-100">
+        {blocks.map((b) => (
+          <div key={b.block_height} className="px-3 py-2.5">
+            <div className="flex items-center justify-between gap-2 mb-0.5">
+              <span className="font-medium text-sm">
+                <BlockHeight height={b.block_height} />
+              </span>
+              <span className="text-xs text-gray-500 shrink-0">
+                <TimeAgo timestampNs={b.block_timestamp} />
+              </span>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <AccountId accountId={b.author_id} />
+              <span className="text-xs text-gray-500 shrink-0">{b.num_transactions} txns</span>
+            </div>
+          </div>
+        ))}
       </div>
       <Pagination
         currentPage={currentPage}

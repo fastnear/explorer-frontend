@@ -8,7 +8,8 @@ import AccountId from "../components/AccountId";
 import TimeAgo from "../components/TimeAgo";
 import Pagination from "../components/Pagination";
 import useTxDetails from "../hooks/useTxDetails";
-import TxRow, { TxTableHeader } from "../components/TxRow";
+import { TxTable } from "../components/TxRow";
+import type { TxTableItem } from "../components/TxRow";
 import GasAmount from "../components/GasAmount";
 import NearAmount from "../components/NearAmount";
 
@@ -73,6 +74,17 @@ export default function BlockDetail() {
   );
   const { txMap } = useTxDetails(visibleHashes);
 
+  const txItems: TxTableItem[] = useMemo(
+    () =>
+      pageTxs.flatMap((btx) => {
+        const parsed = txMap.get(btx.transaction_hash);
+        return parsed
+          ? [{ tx: parsed, timestamp: btx.tx_block_timestamp }]
+          : [];
+      }),
+    [pageTxs, txMap]
+  );
+
   if (error) return <p className="text-red-600">{error}</p>;
   if (!block) return <p className="text-gray-500">Loading block...</p>;
 
@@ -83,7 +95,7 @@ export default function BlockDetail() {
       </h1>
 
       <div className="mb-6 rounded-lg border border-gray-200 bg-surface text-sm">
-        <dl className="grid gap-px sm:grid-cols-2 [&>div]:flex [&>div]:gap-2 [&>div]:border-b [&>div]:border-gray-100 [&>div]:px-4 [&>div]:py-3 [&>div:last-child]:border-b-0 [&>div:nth-last-child(2)]:sm:border-b-0">
+        <dl className="grid gap-px sm:grid-cols-2 [&>div]:flex [&>div]:min-w-0 [&>div]:gap-2 [&>div]:border-b [&>div]:border-gray-100 [&>div]:px-4 [&>div]:py-3 [&>div:last-child]:border-b-0 [&>div:nth-last-child(2)]:sm:border-b-0">
           <div>
             <dt className="shrink-0 text-gray-500">Hash</dt>
             <dd className="min-w-0 truncate"><BlockHash hash={block.block_hash} /></dd>
@@ -142,24 +154,7 @@ export default function BlockDetail() {
       {txs.length > 0 && (
         <>
           <h2 className="mb-3 text-lg font-semibold">Transactions</h2>
-          <div className="min-w-fit rounded-lg border border-gray-200 bg-surface">
-            <table className="w-full text-sm">
-              <TxTableHeader />
-              <tbody>
-                {pageTxs.map((btx) => {
-                  const parsed = txMap.get(btx.transaction_hash);
-                  if (!parsed) return null;
-                  return (
-                    <TxRow
-                      key={btx.transaction_hash}
-                      tx={parsed}
-                      timestamp={btx.tx_block_timestamp}
-                    />
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <TxTable items={txItems} />
           <Pagination
             currentPage={page}
             hasNext={hasNext}

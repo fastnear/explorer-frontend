@@ -108,15 +108,15 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <header className="border-b border-gray-200 bg-surface">
-        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 sm:gap-4 px-4 py-3">
           <Link to="/" className="flex items-center gap-2 font-bold text-lg whitespace-nowrap">
             NEAR Explorer
           </Link>
           <NetworkSwitcher />
-          <div className="flex-1">
+          <ThemeToggle />
+          <div className="w-full sm:w-auto sm:flex-1 order-last sm:order-none">
             <SearchBar />
           </div>
-          <ThemeToggle />
         </div>
       </header>
 

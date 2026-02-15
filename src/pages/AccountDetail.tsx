@@ -4,7 +4,8 @@ import { getAccount } from "../api/endpoints";
 import type { AccountTx } from "../api/types";
 import useTxDetails from "../hooks/useTxDetails";
 import usePagedCache from "../hooks/usePagedCache";
-import TxRow, { TxTableHeader } from "../components/TxRow";
+import { TxTable } from "../components/TxRow";
+import type { TxTableItem } from "../components/TxRow";
 import Pagination from "../components/Pagination";
 
 const PAGE_SIZE = 20;
@@ -58,6 +59,17 @@ export default function AccountDetail() {
 
   const { txMap } = useTxDetails(hashes, accountId);
 
+  const txItems: TxTableItem[] = useMemo(
+    () =>
+      txns.flatMap((atx) => {
+        const parsed = txMap.get(atx.transaction_hash);
+        return parsed
+          ? [{ tx: parsed, timestamp: atx.tx_block_timestamp }]
+          : [];
+      }),
+    [txns, txMap]
+  );
+
   // Only show loading on Next when the next page's data isn't ready yet
   const nextPageReady =
     !hasNext ||
@@ -79,24 +91,7 @@ export default function AccountDetail() {
         </p>
       )}
 
-      <div className="min-w-fit rounded-lg border border-gray-200 bg-surface">
-        <table className="w-full text-sm">
-          <TxTableHeader />
-          <tbody>
-            {txns.map((atx, i) => {
-              const parsed = txMap.get(atx.transaction_hash);
-              if (!parsed) return null;
-              return (
-                <TxRow
-                  key={`${atx.transaction_hash}-${i}`}
-                  tx={parsed}
-                  timestamp={atx.tx_block_timestamp}
-                />
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      <TxTable items={txItems} />
 
       <Pagination
         currentPage={currentPage}
