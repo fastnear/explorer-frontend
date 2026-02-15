@@ -28,6 +28,10 @@ export default function BlockDetail() {
     setNextBlockHeight(null);
     getBlock(/^\d+$/.test(blockId) ? Number(blockId) : blockId, { with_transactions: true })
       .then((data) => {
+        if (!data.block) {
+          setError("Block not found");
+          return;
+        }
         setBlock(data.block);
         setTxs(data.block_txs || []);
         // Fire-and-forget: fetch next block without blocking UI
