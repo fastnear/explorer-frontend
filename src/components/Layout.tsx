@@ -1,7 +1,47 @@
+import { useState, useRef, useEffect } from "react";
 import { Link, Outlet } from "react-router-dom";
 import SearchBar from "./SearchBar";
+import { ChevronDown } from "lucide-react";
+import { networkId, otherNetworkId, otherNetworkUrl } from "../config";
 
-const networkId = import.meta.env.VITE_NETWORK_ID || "mainnet";
+function NetworkSwitcher() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, [open]);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={(e) => { e.preventDefault(); setOpen(!open); }}
+        className="flex items-center gap-0.5 rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 uppercase cursor-pointer hover:bg-gray-200"
+      >
+        {networkId}
+        <ChevronDown className="size-3" />
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full mt-1 rounded border border-gray-200 bg-white text-xs font-medium uppercase shadow-md z-10">
+          <span className="block px-3 py-1.5 text-gray-900 whitespace-nowrap">
+            {networkId} ✓
+          </span>
+          <a
+            href={otherNetworkUrl}
+            className="block px-3 py-1.5 text-gray-500 hover:bg-gray-50 whitespace-nowrap"
+          >
+            {otherNetworkId}
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Layout() {
   return (
@@ -10,10 +50,8 @@ export default function Layout() {
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
           <Link to="/" className="flex items-center gap-2 font-bold text-lg whitespace-nowrap">
             NEAR Explorer
-            <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 uppercase">
-              {networkId}
-            </span>
           </Link>
+          <NetworkSwitcher />
           <div className="flex-1">
             <SearchBar />
           </div>

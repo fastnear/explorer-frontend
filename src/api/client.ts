@@ -1,5 +1,6 @@
-const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://tx.main.fastnear.com";
+import { apiBaseUrl } from "../config";
+
+const BASE_URL = apiBaseUrl;
 
 export async function fetchApi<T>(
   endpoint: string,
