@@ -34,6 +34,8 @@ export default function SearchBar() {
     } else {
       if (q.endsWith(".testnet") && networkId === "mainnet") {
         window.location.href = `${otherNetworkUrl}/account/${q}`;
+      } else if ((q.endsWith(".near") || q.endsWith(".tg")) && networkId === "testnet") {
+        window.location.href = `${otherNetworkUrl}/account/${q}`;
       } else {
         navigate(`/account/${q}`);
       }
