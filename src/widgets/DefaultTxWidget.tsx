@@ -24,7 +24,7 @@ export default function DefaultTxWidget({ tx }: { tx: TransactionDetail }) {
             value={tx}
             collapsed={2}
             shortenTextAfterLength={512}
-            displayDataTypes={false}
+            displayDataTypes={false} displayObjectSize={false}
           />
         </div>
       )}

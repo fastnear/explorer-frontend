@@ -110,7 +110,7 @@ export default function Base64Data({ base64 }: { base64: string }) {
               value={json}
               collapsed={2}
               shortenTextAfterLength={512}
-              displayDataTypes={false}
+              displayDataTypes={false} displayObjectSize={false}
             />
           ) : mode === "hex" ? (
             <div className="font-mono text-gray-700 break-all">

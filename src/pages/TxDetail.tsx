@@ -31,7 +31,7 @@ function EventLog({ log }: { log: string }) {
         )}
         {json.data && (
           <div className="mt-1 overflow-auto text-xs">
-            <JsonView value={json.data} collapsed={2} displayDataTypes={false} shortenTextAfterLength={512} />
+            <JsonView value={json.data} collapsed={2} displayDataTypes={false} displayObjectSize={false} shortenTextAfterLength={512} />
           </div>
         )}
       </div>
@@ -59,7 +59,7 @@ function ReceiptResult({ status }: { status: Record<string, unknown> }) {
   if ("Failure" in status) {
     return (
       <div className="overflow-auto rounded border border-gray-200 bg-red-50 p-2 text-xs text-red-700">
-        <JsonView value={status.Failure as object} collapsed={2} displayDataTypes={false} />
+        <JsonView value={status.Failure as object} collapsed={2} displayDataTypes={false} displayObjectSize={false} />
       </div>
     );
   }

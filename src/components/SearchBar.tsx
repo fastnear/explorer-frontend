@@ -10,8 +10,9 @@ export default function SearchBar() {
     const q = query.trim();
     if (!q) return;
 
-    if (/^\d+$/.test(q)) {
-      navigate(`/block/${q}`);
+    const stripped = q.replaceAll(",", "");
+    if (/^\d+$/.test(stripped)) {
+      navigate(`/block/${stripped}`);
     } else if (q.includes(".near") || q.includes(".testnet")) {
       navigate(`/account/${q}`);
     } else {
