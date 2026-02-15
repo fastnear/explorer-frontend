@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import JsonView from "@uiw/react-json-view";
+import { darkTheme } from "@uiw/react-json-view/dark";
 import { ChevronRight, ChevronDown } from "lucide-react";
 
 type Mode = "json" | "hex" | "base64" | "raw";
@@ -30,9 +31,21 @@ function toHex(bytes: Uint8Array): string {
     .join(" ");
 }
 
+function useIsDark() {
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+  return dark;
+}
+
 const btnBase =
   "px-1.5 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer";
-const btnActive = "bg-gray-700 text-white";
+const btnActive = "bg-gray-700 text-white dark:bg-gray-300 dark:text-gray-900";
 const btnInactive = "bg-gray-200 text-gray-600 hover:bg-gray-300";
 
 function useDecoded(base64: string) {
@@ -51,6 +64,7 @@ function useDecoded(base64: string) {
 
 export default function Base64Data({ base64 }: { base64: string }) {
   const { bytes, text, json, defaultMode, defaultExpanded } = useDecoded(base64);
+  const isDark = useIsDark();
 
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [mode, setMode] = useState<Mode>(defaultMode);
@@ -111,6 +125,7 @@ export default function Base64Data({ base64 }: { base64: string }) {
               collapsed={2}
               shortenTextAfterLength={512}
               displayDataTypes={false} displayObjectSize={false}
+              style={isDark ? darkTheme : undefined}
             />
           ) : mode === "hex" ? (
             <div className="font-mono text-gray-700 break-all">

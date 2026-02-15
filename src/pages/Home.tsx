@@ -55,7 +55,7 @@ export default function Home() {
   return (
     <div>
       <h1 className="mb-4 text-xl font-bold">Latest Blocks</h1>
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-surface">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium uppercase text-gray-500">

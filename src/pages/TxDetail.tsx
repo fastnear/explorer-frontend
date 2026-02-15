@@ -13,9 +13,23 @@ import TimeAgo from "../components/TimeAgo";
 import { ActionExpanded } from "../components/Action";
 import Base64Data from "../components/Base64Data";
 import JsonView from "@uiw/react-json-view";
+import { darkTheme } from "@uiw/react-json-view/dark";
 import { CircleCheck, CircleX, Radio } from "lucide-react";
 
+function useIsDark() {
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+  return dark;
+}
+
 function EventLog({ log }: { log: string }) {
+  const isDark = useIsDark();
   if (!log.startsWith("EVENT_JSON:")) {
     return <div className="whitespace-pre-wrap break-all rounded bg-gray-50 p-2 font-mono">{log}</div>;
   }
@@ -31,7 +45,7 @@ function EventLog({ log }: { log: string }) {
         )}
         {json.data && (
           <div className="mt-1 overflow-auto text-xs">
-            <JsonView value={json.data} collapsed={2} displayDataTypes={false} displayObjectSize={false} shortenTextAfterLength={512} />
+            <JsonView value={json.data} collapsed={2} displayDataTypes={false} displayObjectSize={false} shortenTextAfterLength={512} style={isDark ? darkTheme : undefined} />
           </div>
         )}
       </div>
@@ -43,6 +57,7 @@ function EventLog({ log }: { log: string }) {
 
 
 function ReceiptResult({ status }: { status: Record<string, unknown> }) {
+  const isDark = useIsDark();
   if ("SuccessReceiptId" in status) {
     return (
       <div className="overflow-auto rounded border border-gray-200 bg-gray-50 p-2 text-xs font-mono break-all">
@@ -59,7 +74,7 @@ function ReceiptResult({ status }: { status: Record<string, unknown> }) {
   if ("Failure" in status) {
     return (
       <div className="overflow-auto rounded border border-gray-200 bg-red-50 p-2 text-xs text-red-700">
-        <JsonView value={status.Failure as object} collapsed={2} displayDataTypes={false} displayObjectSize={false} />
+        <JsonView value={status.Failure as object} collapsed={2} displayDataTypes={false} displayObjectSize={false} style={isDark ? darkTheme : undefined} />
       </div>
     );
   }
@@ -83,7 +98,7 @@ function ReceiptCard({ r }: { r: ReceiptWithOutcome }) {
       : [];
 
   return (
-    <div id={`receipt-${r.receipt.receipt_id}`} className="rounded-lg border border-gray-200 bg-white text-sm">
+    <div id={`receipt-${r.receipt.receipt_id}`} className="rounded-lg border border-gray-200 bg-surface text-sm">
       <dl className="grid gap-px sm:grid-cols-2 [&>div]:flex [&>div]:items-center [&>div]:gap-2 [&>div]:border-b [&>div]:border-gray-100 [&>div]:px-4 [&>div]:py-2 [&>div:last-child]:border-b-0 [&>div:nth-last-child(2)]:sm:border-b-0">
         <div className="sm:col-span-2">
           <dt className="shrink-0 text-gray-500">ID</dt>
@@ -205,7 +220,7 @@ export default function TxDetail() {
     <div>
       <h1 className="mb-4 text-xl font-bold">Transaction</h1>
 
-      <div className="mb-6 rounded-lg border border-gray-200 bg-white text-sm">
+      <div className="mb-6 rounded-lg border border-gray-200 bg-surface text-sm">
         <dl className="grid gap-px sm:grid-cols-2 [&>div]:flex [&>div]:items-center [&>div]:gap-2 [&>div]:border-b [&>div]:border-gray-100 [&>div]:px-4 [&>div]:py-2 [&>div:last-child]:border-b-0 [&>div:nth-last-child(2)]:sm:border-b-0">
           <div className="sm:col-span-2">
             <dt className="shrink-0 text-gray-500">Hash</dt>

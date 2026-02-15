@@ -49,7 +49,7 @@ export default function SearchBar() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by tx hash, block height, or account ID"
-          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 pr-20 text-sm focus:border-blue-500 focus:outline-none"
+          className="w-full rounded-lg border border-gray-300 bg-surface px-4 py-2 pr-20 text-sm focus:border-blue-500 focus:outline-none"
         />
         {type && (
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">

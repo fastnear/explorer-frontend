@@ -79,7 +79,7 @@ export default function AccountDetail() {
         </p>
       )}
 
-      <div className="min-w-fit rounded-lg border border-gray-200 bg-white">
+      <div className="min-w-fit rounded-lg border border-gray-200 bg-surface">
         <table className="w-full text-sm">
           <TxTableHeader />
           <tbody>

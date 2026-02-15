@@ -82,7 +82,7 @@ export default function BlockDetail() {
         Block #<Link to={`/block/${block.block_height}`} className="hover:underline">{block.block_height.toLocaleString()}</Link>
       </h1>
 
-      <div className="mb-6 rounded-lg border border-gray-200 bg-white text-sm">
+      <div className="mb-6 rounded-lg border border-gray-200 bg-surface text-sm">
         <dl className="grid gap-px sm:grid-cols-2 [&>div]:flex [&>div]:gap-2 [&>div]:border-b [&>div]:border-gray-100 [&>div]:px-4 [&>div]:py-3 [&>div:last-child]:border-b-0 [&>div:nth-last-child(2)]:sm:border-b-0">
           <div>
             <dt className="shrink-0 text-gray-500">Hash</dt>
@@ -142,7 +142,7 @@ export default function BlockDetail() {
       {txs.length > 0 && (
         <>
           <h2 className="mb-3 text-lg font-semibold">Transactions</h2>
-          <div className="min-w-fit rounded-lg border border-gray-200 bg-white">
+          <div className="min-w-fit rounded-lg border border-gray-200 bg-surface">
             <table className="w-full text-sm">
               <TxTableHeader />
               <tbody>
