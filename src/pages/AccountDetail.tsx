@@ -3,12 +3,12 @@ import { useParams } from "react-router-dom";
 import { getAccount } from "../api/endpoints";
 import type { AccountTx } from "../api/types";
 import useTxDetails from "../hooks/useTxDetails";
-import usePagedCache from "../hooks/usePagedCache";
+import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import { TxTable } from "../components/TxRow";
 import type { TxTableItem } from "../components/TxRow";
-import Pagination from "../components/Pagination";
+import InfiniteScrollSentinel from "../components/InfiniteScrollSentinel";
 
-const PAGE_SIZE = 20;
+const BATCH_SIZE = 80;
 
 export default function AccountDetail() {
   const { accountId } = useParams<{ accountId: string }>();
@@ -17,7 +17,7 @@ export default function AccountDetail() {
     async (resumeToken?: string, limit?: number) => {
       const data = await getAccount(accountId!, {
         resume_token: resumeToken,
-        limit: limit ?? PAGE_SIZE,
+        limit: limit ?? BATCH_SIZE,
       });
       return {
         items: data.account_txs,
@@ -30,25 +30,20 @@ export default function AccountDetail() {
 
   const {
     items: txns,
-    currentPage,
     totalCount,
-    hasNext,
-    hasPrev,
-    goFirst,
-    goNext,
-    goPrev,
+    hasMore,
+    loadMore,
     loading,
+    loadingMore,
     error,
     aheadItems,
-  } = usePagedCache<AccountTx>({
+  } = useInfiniteScroll<AccountTx>({
     fetchPage,
-    pageSize: PAGE_SIZE,
+    batchSize: BATCH_SIZE,
     key: accountId ?? "",
   });
 
-  // Current page hashes first, then ahead pages for preloading.
-  // useTxDetails fires each batch of 20 independently, so current page
-  // renders as soon as its batch resolves without waiting for preloads.
+  // All accumulated hashes + prefetched ahead buffer for preloading
   const hashes = useMemo(() => {
     const current = txns.map((t) => t.transaction_hash);
     const ahead = (aheadItems as AccountTx[]).map(
@@ -70,13 +65,6 @@ export default function AccountDetail() {
     [txns, txMap]
   );
 
-  // Only show loading on Next when the next page's data isn't ready yet
-  const nextPageReady =
-    !hasNext ||
-    (aheadItems.length > 0 &&
-      txMap.has((aheadItems[0] as AccountTx).transaction_hash));
-  const nextBusy = loading || !nextPageReady;
-
   if (error) return <p className="text-red-600">{error}</p>;
 
   return (
@@ -93,14 +81,11 @@ export default function AccountDetail() {
 
       <TxTable items={txItems} />
 
-      <Pagination
-        currentPage={currentPage}
-        hasNext={hasNext}
-        hasPrev={hasPrev}
-        goFirst={goFirst}
-        goPrev={goPrev}
-        goNext={goNext}
-        nextBusy={nextBusy}
+      <InfiniteScrollSentinel
+        onLoadMore={loadMore}
+        hasMore={hasMore}
+        disabled={loading || txItems.length === 0}
+        loadingMore={loadingMore}
       />
     </div>
   );

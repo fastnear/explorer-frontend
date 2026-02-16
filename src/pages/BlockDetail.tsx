@@ -6,26 +6,26 @@ import BlockHash from "../components/BlockHash";
 import BlockHeight from "../components/BlockHeight";
 import AccountId from "../components/AccountId";
 import TimeAgo from "../components/TimeAgo";
-import Pagination from "../components/Pagination";
+import InfiniteScrollSentinel from "../components/InfiniteScrollSentinel";
 import useTxDetails from "../hooks/useTxDetails";
 import { TxTable } from "../components/TxRow";
 import type { TxTableItem } from "../components/TxRow";
 import GasAmount from "../components/GasAmount";
 import NearAmount from "../components/NearAmount";
 
-const PAGE_SIZE = 20;
+const VISIBLE_STEP = 40;
 
 export default function BlockDetail() {
   const { blockId } = useParams<{ blockId: string }>();
   const [block, setBlock] = useState<BlockHeader | null>(null);
   const [txs, setTxs] = useState<BlockTx[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(VISIBLE_STEP);
   const [nextBlockHeight, setNextBlockHeight] = useState<number | null>(null);
 
   useEffect(() => {
     if (!blockId) return;
-    setPage(0);
+    setVisibleCount(VISIBLE_STEP);
     setNextBlockHeight(null);
     getBlock(/^\d+$/.test(blockId) ? Number(blockId) : blockId, { with_transactions: true })
       .then((data) => {
@@ -51,38 +51,33 @@ export default function BlockDetail() {
       .catch((err) => setError(String(err)));
   }, [blockId]);
 
-  const totalPages = Math.ceil(txs.length / PAGE_SIZE);
-  const hasNext = page < totalPages - 1;
-  const hasPrev = page > 0;
+  const visibleTxs = useMemo(
+    () => txs.slice(0, visibleCount),
+    [txs, visibleCount]
+  );
+  const hasMore = visibleCount < txs.length;
 
-  const goFirst = useCallback(() => setPage(0), []);
-  const goPrev = useCallback(() => setPage((p) => Math.max(0, p - 1)), []);
-  const goNext = useCallback(
-    () => setPage((p) => Math.min(totalPages - 1, p + 1)),
-    [totalPages]
+  const loadMore = useCallback(
+    () => setVisibleCount((c) => Math.min(c + VISIBLE_STEP, txs.length)),
+    [txs.length]
   );
 
-  const pageTxs = useMemo(
-    () => txs.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE),
-    [txs, page]
-  );
-
-  // Fetch details for current page + one page ahead for preloading
+  // Fetch details for visible txs + one step ahead for preloading
   const visibleHashes = useMemo(
-    () => txs.slice(page * PAGE_SIZE, (page + 2) * PAGE_SIZE).map((t) => t.transaction_hash),
-    [txs, page]
+    () => txs.slice(0, visibleCount + VISIBLE_STEP).map((t) => t.transaction_hash),
+    [txs, visibleCount]
   );
   const { txMap } = useTxDetails(visibleHashes);
 
   const txItems: TxTableItem[] = useMemo(
     () =>
-      pageTxs.flatMap((btx) => {
+      visibleTxs.flatMap((btx) => {
         const parsed = txMap.get(btx.transaction_hash);
         return parsed
           ? [{ tx: parsed, timestamp: btx.tx_block_timestamp }]
           : [];
       }),
-    [pageTxs, txMap]
+    [visibleTxs, txMap]
   );
 
   if (error) return <p className="text-red-600">{error}</p>;
@@ -155,13 +150,10 @@ export default function BlockDetail() {
         <>
           <h2 className="mb-3 text-lg font-semibold">Transactions</h2>
           <TxTable items={txItems} />
-          <Pagination
-            currentPage={page}
-            hasNext={hasNext}
-            hasPrev={hasPrev}
-            goFirst={goFirst}
-            goPrev={goPrev}
-            goNext={goNext}
+          <InfiniteScrollSentinel
+            onLoadMore={loadMore}
+            hasMore={hasMore}
+            disabled={txItems.length === 0}
           />
         </>
       )}
