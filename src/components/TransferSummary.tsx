@@ -1,9 +1,12 @@
 import { useState } from "react";
 import type { TransferInfo } from "../utils/parseTransaction";
 import useTokenMetadata, { type TokenMetadata } from "../hooks/useTokenMetadata";
+import useMultiTokenMetadata, {
+  type MultiTokenMetadata,
+} from "../hooks/useMultiTokenMetadata";
 import AccountId from "./AccountId";
 import NearAmount from "./NearAmount";
-import { ArrowLeftRight, Cog, Loader2 } from "lucide-react";
+import { ArrowLeftRight, CircleStop, Cog, Coins, Flame, Loader2 } from "lucide-react";
 
 function formatTokenAmount(amount: string, decimals: number): string {
   if (amount === "0") return "0";
@@ -15,11 +18,11 @@ function formatTokenAmount(amount: string, decimals: number): string {
   return `${whole}.${frac.slice(0, 5)}`;
 }
 
-function TokenIcon({ icon, symbol }: { icon: string; symbol: string }) {
+function TokenIcon({ src, alt }: { src: string; alt: string }) {
   return (
     <img
-      src={icon}
-      alt={symbol}
+      src={src}
+      alt={alt}
       className="inline-block size-3.5 rounded-full object-cover align-text-bottom"
     />
   );
@@ -33,31 +36,136 @@ function truncateSymbol(symbol: string): string {
     : symbol;
 }
 
-function TokenAmount({ amount, meta }: { amount: string; meta: TokenMetadata }) {
+function TokenAmount({
+  amount,
+  meta,
+  contractId,
+  tokenId,
+}: {
+  amount: string;
+  meta: TokenMetadata;
+  contractId?: string;
+  tokenId?: string;
+}) {
   const [showRaw, setShowRaw] = useState(false);
   const symbol = truncateSymbol(meta.symbol);
   return (
     <span
-      className="cursor-pointer whitespace-nowrap font-mono hover:underline decoration-dotted inline-flex items-center gap-0.5"
+      className={`cursor-pointer font-mono hover:underline decoration-dotted inline-flex items-center gap-0.5 ${showRaw ? "flex-wrap break-all" : "whitespace-nowrap"}`}
       onClick={() => setShowRaw(!showRaw)}
-      title={showRaw ? `Click to show in ${meta.symbol}` : "Click to show raw units"}
+      title={
+        showRaw
+          ? `Click to show in ${meta.symbol}`
+          : "Click to show raw units"
+      }
     >
       {showRaw
         ? `${amount} units ${symbol}`
         : `${formatTokenAmount(amount, meta.decimals)} ${symbol}`}
-      {meta.icon && <TokenIcon icon={meta.icon} symbol={meta.symbol} />}
+      {meta.icon && <TokenIcon src={meta.icon} alt={meta.symbol} />}
+      {showRaw && contractId && (
+        <>
+          <AccountId accountId={contractId} />
+          {tokenId && (
+            <span className="text-gray-400 break-all" title={tokenId}>
+              :{tokenId.length > 150 ? tokenId.slice(0, 147) + "\u2026" : tokenId}
+            </span>
+          )}
+        </>
+      )}
     </span>
   );
 }
 
-function SystemBadge({ label }: { label: string }) {
+function MultiTokenAmount({
+  amount,
+  meta,
+  contractId,
+  tokenId,
+}: {
+  amount: string;
+  meta: MultiTokenMetadata;
+  contractId?: string;
+  tokenId?: string;
+}) {
+  const [showRaw, setShowRaw] = useState(false);
+  const label = truncateSymbol(meta.symbol ?? meta.title);
+  const hasDecimals = meta.decimals != null && meta.decimals > 0;
+  const clickable = hasDecimals || contractId;
   return (
     <span
-      className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-gray-400"
-      title={label}
+      className={`font-mono inline-flex items-center gap-0.5${clickable ? " cursor-pointer hover:underline decoration-dotted" : ""} ${showRaw ? "flex-wrap break-all" : "whitespace-nowrap"}`}
+      onClick={clickable ? () => setShowRaw(!showRaw) : undefined}
+      title={
+        clickable
+          ? showRaw
+            ? `Click to show in ${meta.symbol ?? meta.title}`
+            : "Click to show raw units"
+          : (meta.description ?? meta.title)
+      }
+    >
+      {hasDecimals && !showRaw
+        ? `${formatTokenAmount(amount, meta.decimals!)} ${label}`
+        : `${amount} units ${label}`}
+      {meta.media && <TokenIcon src={meta.media} alt={meta.title} />}
+      {showRaw && contractId && (
+        <>
+          <AccountId accountId={contractId} />
+          {tokenId && (
+            <span className="text-gray-400 break-all" title={tokenId}>
+              :{tokenId.length > 150 ? tokenId.slice(0, 147) + "\u2026" : tokenId}
+            </span>
+          )}
+        </>
+      )}
+    </span>
+  );
+}
+
+function MintBadge({ tokenIcon }: { tokenIcon?: React.ReactNode }) {
+  return (
+    <span
+      className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-green-500"
+      title="Mint"
     >
       <Cog className="size-3" />
-      <span>{label}</span>
+      {tokenIcon}
+      <span>Mint</span>
+    </span>
+  );
+}
+
+function BurnBadge({ tokenIcon }: { tokenIcon?: React.ReactNode }) {
+  return (
+    <span
+      className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-orange-400"
+      title="Burn"
+    >
+      <Flame className="size-3" />
+      {tokenIcon}
+      <span>Burn</span>
+    </span>
+  );
+}
+
+function RawTokenAmount({
+  amount,
+  contractId,
+  tokenId,
+}: {
+  amount: string;
+  contractId?: string;
+  tokenId?: string;
+}) {
+  return (
+    <span className="font-mono whitespace-nowrap">
+      {amount}{" "}
+      {contractId && <AccountId accountId={contractId} />}
+      {tokenId && (
+        <span className="text-gray-400" title={tokenId}>
+          :{tokenId.length > 20 ? tokenId.slice(0, 17) + "\u2026" : tokenId}
+        </span>
+      )}
     </span>
   );
 }
@@ -67,32 +175,102 @@ export default function TransferSummary({
 }: {
   transfer: TransferInfo;
 }) {
-  const { metadata, loading } = useTokenMetadata(transfer.tokenContractId);
+  // Determine token ID prefix for nep245 tokens
+  const hasNep141Prefix = transfer.tokenId?.startsWith("nep141:");
+  const hasNep245Prefix = transfer.tokenId?.startsWith("nep245:");
+  const isNativeMt =
+    transfer.tokenType === "nep245" && !hasNep141Prefix && !hasNep245Prefix;
+  // Use MT metadata for native MT tokens and nep245:-prefixed tokens
+  const usesMtLookup = isNativeMt || !!hasNep245Prefix;
+
+  // FT metadata — for nep141 tokens and nep245 with nep141: prefix
+  const ftContractId = !usesMtLookup
+    ? transfer.tokenType === "near"
+      ? null
+      : transfer.tokenType === "nep141"
+        ? (transfer.contractId ?? null)
+        : hasNep141Prefix && transfer.tokenId
+          ? transfer.tokenId.slice(7)
+          : null
+    : null;
+  const { metadata: ftMeta, loading: ftLoading } =
+    useTokenMetadata(ftContractId);
+
+  // For nep245: prefix, extract inner contract + token ID
+  // e.g. "nep245:contract.near:42" → contract "contract.near", token "42"
+  const nep245Inner = hasNep245Prefix && transfer.tokenId
+    ? (() => {
+        const rest = transfer.tokenId!.slice(7);
+        const colonIdx = rest.indexOf(":");
+        return colonIdx >= 0
+          ? { contract: rest.slice(0, colonIdx), token: rest.slice(colonIdx + 1) }
+          : { contract: rest, token: null };
+      })()
+    : null;
+
+  // MT metadata — for native nep245 tokens and nep245: prefix
+  const mtContract = isNativeMt
+    ? (transfer.contractId ?? null)
+    : nep245Inner?.contract ?? null;
+  const mtTokenId = isNativeMt
+    ? (transfer.tokenId ?? null)
+    : nep245Inner?.token ?? null;
+  const { metadata: mtMeta, loading: mtLoading } = useMultiTokenMetadata(
+    mtContract,
+    mtTokenId,
+  );
+
+  const loading = usesMtLookup ? mtLoading : ftLoading;
+  const tokenIcon =
+    transfer.tokenType === "nep245"
+      ? <Coins className="size-3" />
+      : transfer.tokenType === "nep141"
+        ? <CircleStop className="size-3" />
+        : null;
 
   return (
     <span className="inline-flex flex-wrap items-center gap-1">
-      {transfer.from !== null && transfer.to !== null && (
+      {transfer.from !== null && transfer.to !== null && tokenIcon && (
         <span className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-gray-400">
           <ArrowLeftRight className="size-3" />
-          <span>Transfer</span>
+          {tokenIcon}
         </span>
       )}
-      {transfer.from === null && <SystemBadge label="Mint" />}
-      {transfer.to === null && <SystemBadge label="Burn" />}
+      {transfer.from === null && (
+        <MintBadge tokenIcon={tokenIcon} />
+      )}
+      {transfer.to === null && (
+        <BurnBadge tokenIcon={tokenIcon} />
+      )}
       {transfer.from !== null && <AccountId accountId={transfer.from} />}
       <span className="text-gray-400">&rarr;</span>
       {transfer.to !== null && <AccountId accountId={transfer.to} />}
-      {transfer.tokenContractId === null ? (
+      {transfer.tokenType === "near" ? (
         <NearAmount yoctoNear={transfer.amount} />
       ) : loading ? (
         <Loader2 className="size-3 animate-spin text-gray-400" />
-      ) : metadata ? (
-        <TokenAmount amount={transfer.amount} meta={metadata} />
+      ) : usesMtLookup && mtMeta ? (
+        <MultiTokenAmount
+          amount={transfer.amount}
+          meta={mtMeta}
+          contractId={transfer.contractId}
+          tokenId={transfer.tokenId}
+        />
+      ) : !usesMtLookup && ftMeta ? (
+        <TokenAmount
+          amount={transfer.amount}
+          meta={ftMeta}
+          contractId={transfer.contractId}
+          tokenId={transfer.tokenId}
+        />
       ) : (
-        <span className="font-mono">
-          {transfer.amount}{" "}
-          <AccountId accountId={transfer.tokenContractId} />
-        </span>
+        <RawTokenAmount
+          amount={transfer.amount}
+          contractId={transfer.contractId}
+          tokenId={
+            transfer.tokenType === "nep245" ? transfer.tokenId : undefined
+          }
+        />
       )}
     </span>
   );

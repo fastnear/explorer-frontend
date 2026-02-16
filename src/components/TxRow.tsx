@@ -7,10 +7,12 @@ import TimeAgo from "./TimeAgo";
 import AccountId from "./AccountId";
 import Action from "./Action";
 import TransferSummary from "./TransferSummary";
+import type { TransferInfo } from "../utils/parseTransaction";
 import { CircleCheck, CircleX, Radio } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const ACTIONS_LIMIT = 3;
+const TRANSFERS_LIMIT = 3;
 
 function ActionList({ actions }: { actions: ParsedAction[] }) {
   const [expanded, setExpanded] = useState(false);
@@ -30,6 +32,28 @@ function ActionList({ actions }: { actions: ParsedAction[] }) {
           className="cursor-pointer text-blue-600 hover:text-blue-800"
         >
           + {actions.length - ACTIONS_LIMIT} more...
+        </button>
+      )}
+    </>
+  );
+}
+
+function TransferList({ transfers }: { transfers: TransferInfo[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const showAll = expanded || transfers.length <= TRANSFERS_LIMIT;
+  const visible = showAll ? transfers : transfers.slice(0, TRANSFERS_LIMIT);
+
+  return (
+    <>
+      {visible.map((t, i) => (
+        <TransferSummary key={i} transfer={t} />
+      ))}
+      {!showAll && (
+        <button
+          onClick={() => setExpanded(true)}
+          className="cursor-pointer text-blue-600 hover:text-blue-800 text-left"
+        >
+          + {transfers.length - TRANSFERS_LIMIT} more...
         </button>
       )}
     </>
@@ -103,9 +127,7 @@ export default function TxRow({ tx, timestamp }: TxTableItem) {
         <tr className="border-b border-gray-100 group-hover:bg-gray-50">
           <td colSpan={7} className="pb-2 pt-0 pl-10 pr-4">
             <div className="flex flex-col gap-0.5 text-xs text-gray-600 dark:text-gray-400">
-              {tx.transfers.map((t, i) => (
-                <TransferSummary key={i} transfer={t} />
-              ))}
+              <TransferList transfers={tx.transfers} />
             </div>
           </td>
         </tr>
@@ -157,9 +179,7 @@ function TxMobileCard({ tx, timestamp }: TxTableItem) {
       </div>
       {tx.transfers.length > 0 && (
         <div className="flex flex-col gap-0.5 text-xs text-gray-600 dark:text-gray-400 mt-1 pt-1 border-t border-gray-100">
-          {tx.transfers.map((t, i) => (
-            <TransferSummary key={i} transfer={t} />
-          ))}
+          <TransferList transfers={tx.transfers} />
         </div>
       )}
     </div>
