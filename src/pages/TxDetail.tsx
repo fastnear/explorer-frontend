@@ -11,6 +11,7 @@ import AccountId from "../components/AccountId";
 import BlockHeight from "../components/BlockHeight";
 import TimeAgo from "../components/TimeAgo";
 import { ActionExpanded } from "../components/Action";
+import TransferSummary from "../components/TransferSummary";
 import Base64Data from "../components/Base64Data";
 import JsonView from "@uiw/react-json-view";
 import { darkTheme } from "@uiw/react-json-view/dark";
@@ -283,6 +284,19 @@ export default function TxDetail() {
           </div>
         </dl>
       </div>
+
+      {parsed.transfers.length > 0 && (
+        <div className="mb-6 rounded-lg border border-gray-200 bg-surface text-sm">
+          <div className="border-b border-gray-100 px-4 py-2">
+            <h2 className="text-xs font-medium uppercase text-gray-500">Transfers</h2>
+          </div>
+          <div className="flex flex-col gap-1 px-4 py-3">
+            {parsed.transfers.map((t, i) => (
+              <TransferSummary key={i} transfer={t} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {explanationWidgets.map((w) => (
         <w.component key={w.id} tx={tx} />
