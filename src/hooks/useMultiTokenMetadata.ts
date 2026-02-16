@@ -38,7 +38,7 @@ async function fetchMtMetadata(
           request_type: "call_function",
           finality: "final",
           account_id: contractId,
-          method_name: "mt_metadata_token_by_token_id",
+          method_name: "mt_metadata_base_by_token_id",
           args_base64: btoa(JSON.stringify({ token_ids: [tokenId] })),
         },
       }),
@@ -52,10 +52,10 @@ async function fetchMtMetadata(
       if (Array.isArray(arr) && arr.length > 0 && arr[0]) {
         const meta = arr[0];
         return {
-          title: meta.title ?? tokenId,
+          title: meta.name ?? meta.title ?? tokenId,
           symbol: meta.symbol,
           decimals: typeof meta.decimals === "number" ? meta.decimals : undefined,
-          media: meta.media,
+          media: meta.icon ?? meta.media,
           description: meta.description,
         };
       }
