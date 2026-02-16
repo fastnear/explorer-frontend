@@ -6,7 +6,7 @@ import useMultiTokenMetadata, {
 } from "../hooks/useMultiTokenMetadata";
 import AccountId from "./AccountId";
 import NearAmount from "./NearAmount";
-import { ArrowLeftRight, CircleStop, Cog, Coins, Flame, Loader2 } from "lucide-react";
+import { CircleStop, Coins, Loader2 } from "lucide-react";
 
 function formatTokenAmount(amount: string, decimals: number): string {
   if (amount === "0") return "0";
@@ -124,11 +124,7 @@ function MultiTokenAmount({
 
 function MintBadge({ tokenIcon }: { tokenIcon?: React.ReactNode }) {
   return (
-    <span
-      className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-green-500"
-      title="Mint"
-    >
-      <Cog className="size-3" />
+    <span className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-green-500">
       {tokenIcon}
       <span>Mint</span>
     </span>
@@ -137,11 +133,7 @@ function MintBadge({ tokenIcon }: { tokenIcon?: React.ReactNode }) {
 
 function BurnBadge({ tokenIcon }: { tokenIcon?: React.ReactNode }) {
   return (
-    <span
-      className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-orange-400"
-      title="Burn"
-    >
-      <Flame className="size-3" />
+    <span className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-orange-400">
       {tokenIcon}
       <span>Burn</span>
     </span>
@@ -232,16 +224,11 @@ export default function TransferSummary({
     <span className="inline-flex flex-wrap items-center gap-1">
       {transfer.from !== null && transfer.to !== null && tokenIcon && (
         <span className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-gray-400">
-          <ArrowLeftRight className="size-3" />
           {tokenIcon}
         </span>
       )}
-      {transfer.from === null && (
-        <MintBadge tokenIcon={tokenIcon} />
-      )}
-      {transfer.to === null && (
-        <BurnBadge tokenIcon={tokenIcon} />
-      )}
+      {transfer.from === null && <MintBadge tokenIcon={tokenIcon} />}
+      {transfer.to === null && <BurnBadge tokenIcon={tokenIcon} />}
       {transfer.from !== null && <AccountId accountId={transfer.from} />}
       <span className="text-gray-400">&rarr;</span>
       {transfer.to !== null && <AccountId accountId={transfer.to} />}
