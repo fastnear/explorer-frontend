@@ -1,8 +1,8 @@
 import type { TransactionDetail } from "../api/types";
 import { parseTransaction } from "../utils/parseTransaction";
-import useTokenMetadata from "../tokens/useTokenMetadata";
+import useTokenMetadata from "../hooks/useTokenMetadata";
 import AccountId from "../components/AccountId";
-import TokenAmount from "../components/TokenAmount";
+import { TokenAmount } from "../components/TransferSummary";
 import WidgetCard from "../components/WidgetCard";
 import { ArrowRight, Loader2 } from "lucide-react";
 
@@ -63,7 +63,7 @@ export default function FtTransferWidget({
           {loading ? (
             <Loader2 className="inline size-3.5 animate-spin text-gray-400" />
           ) : metadata ? (
-            <TokenAmount amount={args.amount} metadata={metadata} />
+            <TokenAmount amount={args.amount} meta={metadata} contractId={tokenContractId} />
           ) : (
             <>
               {args.amount}{" "}

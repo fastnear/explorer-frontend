@@ -36,7 +36,7 @@ function truncateSymbol(symbol: string): string {
     : symbol;
 }
 
-function TokenAmount({
+export function TokenAmount({
   amount,
   meta,
   contractId,
