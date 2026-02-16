@@ -207,8 +207,8 @@ export default function TxDetail() {
 
   const parsed = parseTransaction(tx);
   const allWidgets = getMatchingWidgets(tx);
-  const explanationWidgets = allWidgets.filter((w) => w.priority > 0);
-  const utilityWidgets = allWidgets.filter((w) => w.priority === 0);
+  const explanationWidgets = allWidgets.filter((w) => w.type === "explanation");
+  const utilityWidgets = allWidgets.filter((w) => w.type === "utility");
 
   // Total gas and tokens burnt across all outcomes
   let totalGas = tx.execution_outcome.outcome.gas_burnt;

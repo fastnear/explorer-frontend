@@ -8,34 +8,34 @@ export interface Widget {
   id: string;
   match: (tx: TransactionDetail) => boolean;
   component: ComponentType<{ tx: TransactionDetail }>;
-  priority: number;
+  /** Explanation widgets render above receipts; utility widgets render below */
+  type: "explanation" | "utility";
 }
 
+/** Order matters — first match of each type wins display position */
 const registry: Widget[] = [
   {
     id: "near-transfer",
     match: matchNearTransfer,
     component: NearTransferWidget,
-    priority: 10,
+    type: "explanation",
   },
   {
     id: "ft-transfer",
     match: matchFtTransfer,
     component: FtTransferWidget,
-    priority: 10,
+    type: "explanation",
   },
   {
     id: "default",
     match: () => true,
     component: DefaultTxWidget,
-    priority: 0,
+    type: "utility",
   },
 ];
 
 export function getMatchingWidgets(tx: TransactionDetail): Widget[] {
-  return registry
-    .filter((w) => w.match(tx))
-    .sort((a, b) => b.priority - a.priority);
+  return registry.filter((w) => w.match(tx));
 }
 
 export function registerWidget(widget: Widget) {
