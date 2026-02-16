@@ -69,6 +69,24 @@ export function parseAction(action: TransactionAction): ParsedAction {
   return result;
 }
 
+function getDeleteAccountBeneficiary(
+  action: TransactionAction,
+): string | undefined {
+  if (typeof action === "string") return undefined;
+  if (action.DeleteAccount && typeof action.DeleteAccount === "object") {
+    return (action.DeleteAccount as Record<string, unknown>).beneficiary_id as
+      | string
+      | undefined;
+  }
+  if (
+    action.type === "DeleteAccount" &&
+    typeof action.beneficiary_id === "string"
+  ) {
+    return action.beneficiary_id as string;
+  }
+  return undefined;
+}
+
 function getTransferDeposit(action: TransactionAction): string | undefined {
   if (typeof action === "string") return undefined;
   // Top-level format: { Transfer: { deposit: "..." } }
@@ -116,7 +134,36 @@ function extractTransfers(tx: TransactionDetail): TransferInfo[] {
     }
   }
 
-  // 2. NEP-141 events from receipt logs (ft_transfer, ft_mint, ft_burn)
+  // 2. DeleteAccount — remaining balance goes to beneficiary
+  for (const action of actions) {
+    const beneficiary = getDeleteAccountBeneficiary(action);
+    if (!beneficiary) continue;
+    // Find the system receipt that transfers the remaining balance
+    for (const r of tx.receipts) {
+      if (
+        r.receipt.predecessor_id !== "system" ||
+        r.receipt.receiver_id !== beneficiary
+      )
+        continue;
+      const actionData = (r.receipt.receipt as Record<string, unknown>)
+        .Action as Record<string, unknown> | undefined;
+      const receiptActions =
+        (actionData?.actions as TransactionAction[]) ?? [];
+      for (const ra of receiptActions) {
+        const deposit = getTransferDeposit(ra);
+        if (deposit && deposit !== "0") {
+          transfers.push({
+            from: receiver,
+            to: beneficiary,
+            amount: deposit,
+            tokenContractId: null,
+          });
+        }
+      }
+    }
+  }
+
+  // 3. NEP-141 events from receipt logs (ft_transfer, ft_mint, ft_burn)
   for (const r of tx.receipts) {
     const contractId = r.receipt.receiver_id;
     for (const log of r.execution_outcome.outcome.logs) {

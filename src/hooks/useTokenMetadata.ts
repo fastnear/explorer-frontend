@@ -10,8 +10,8 @@ export interface TokenMetadata {
 
 const RPC_URL =
   networkId === "testnet"
-    ? "https://rpc.testnet.near.org"
-    : "https://rpc.mainnet.near.org";
+    ? "https://rpc.testnet.fastnear.com"
+    : "https://rpc.mainnet.fastnear.com";
 
 const WELL_KNOWN: Record<string, TokenMetadata> = {
   "wrap.near": { name: "Wrapped NEAR", symbol: "wNEAR", decimals: 24 },
@@ -22,7 +22,6 @@ const WELL_KNOWN: Record<string, TokenMetadata> = {
     decimals: 6,
   },
   "token.sweat": { name: "SWEAT", symbol: "SWEAT", decimals: 18 },
-  aurora: { name: "Aurora", symbol: "AURORA", decimals: 18 },
   "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": {
     name: "Aurora",
     symbol: "AURORA",
@@ -41,6 +40,8 @@ const WELL_KNOWN: Record<string, TokenMetadata> = {
   },
   "token.0xshitzu.near": { name: "Shitzu", symbol: "SHITZU", decimals: 18 },
   "ftv2.nekotoken.near": { name: "Neko", symbol: "NEKO", decimals: 24 },
+  "game.hot.tg": { name: "HOT", symbol: "HOT", decimals: 6 },
+  "aa-harvest-moon.near": { name: "Harvest Moon", symbol: "MOON", decimals: 8 },
 };
 
 // Global cache shared across all hook instances
@@ -106,13 +107,23 @@ export default function useTokenMetadata(contractId: string | null): {
   useEffect(() => {
     if (!contractId) return;
 
-    if (cache.has(contractId)) {
-      setMetadata(cache.get(contractId) ?? null);
+    const cached = cache.get(contractId);
+    if (cached && cached.icon) {
+      // Fully resolved (has icon already)
+      setMetadata(cached);
       setLoading(false);
       return;
     }
 
-    setLoading(true);
+    if (cached) {
+      // Have metadata but missing icon — show what we have, fetch icon in background
+      setMetadata(cached);
+      setLoading(false);
+    } else if (!cache.has(contractId)) {
+      // Unknown token — full loading state
+      setLoading(true);
+    }
+
     let cancelled = false;
 
     // Deduplicate concurrent requests for the same contract
@@ -123,10 +134,16 @@ export default function useTokenMetadata(contractId: string | null): {
     }
 
     promise.then((result) => {
-      cache.set(contractId, result);
       pending.delete(contractId);
+      if (cached && result?.icon) {
+        // Merge fetched icon into existing well-known metadata
+        const updated = { ...cached, icon: result.icon };
+        cache.set(contractId, updated);
+      } else if (!cached) {
+        cache.set(contractId, result);
+      }
       if (!cancelled) {
-        setMetadata(result);
+        setMetadata(cache.get(contractId) ? { ...cache.get(contractId)! } : null);
         setLoading(false);
       }
     });
