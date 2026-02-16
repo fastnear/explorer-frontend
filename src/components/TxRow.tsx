@@ -6,6 +6,7 @@ import TransactionHash from "./TransactionHash";
 import TimeAgo from "./TimeAgo";
 import AccountId from "./AccountId";
 import Action from "./Action";
+import TransferSummary from "./TransferSummary";
 import { CircleCheck, CircleX, Radio } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -58,44 +59,58 @@ export function TxTableHeader() {
 }
 
 export default function TxRow({ tx, timestamp }: TxTableItem) {
+  const hasTransfers = tx.transfers.length > 0;
   return (
-    <tr className="border-b border-gray-100 hover:bg-gray-50">
-      <td className="whitespace-nowrap px-4 py-3">
-        <TransactionHash hash={tx.hash} />
-      </td>
-      <td className="whitespace-nowrap px-4 py-3 text-gray-500">
-        <TimeAgo timestampNs={timestamp} />
-      </td>
-      <td className="px-4 py-3">
-        <span className="inline-flex items-center gap-1">
-          {tx.relayer_id && (
-            <Link
-              to={`/account/${tx.relayer_id}`}
-              title={`Relayed by ${tx.relayer_id}`}
-            >
-              <Radio className="size-3.5 text-red-500" />
-            </Link>
+    <tbody className="group">
+      <tr className={`border-b border-gray-100 group-hover:bg-gray-50 ${hasTransfers ? "border-b-0" : ""}`}>
+        <td className="whitespace-nowrap px-4 py-3">
+          <TransactionHash hash={tx.hash} />
+        </td>
+        <td className="whitespace-nowrap px-4 py-3 text-gray-500">
+          <TimeAgo timestampNs={timestamp} />
+        </td>
+        <td className="px-4 py-3">
+          <span className="inline-flex items-center gap-1">
+            {tx.relayer_id && (
+              <Link
+                to={`/account/${tx.relayer_id}`}
+                title={`Relayed by ${tx.relayer_id}`}
+              >
+                <Radio className="size-3.5 text-red-500" />
+              </Link>
+            )}
+            <AccountId accountId={tx.signer_id} />
+          </span>
+        </td>
+        <td className="px-4 py-3">
+          <AccountId accountId={tx.receiver_id} />
+        </td>
+        <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">
+          <ActionList actions={tx.actions} />
+        </td>
+        <td className="whitespace-nowrap px-4 py-3 text-xs">
+          <GasAmount gas={tx.gas_burnt} />
+        </td>
+        <td className="whitespace-nowrap px-4 py-3">
+          {tx.is_success ? (
+            <CircleCheck className="size-4 text-green-600" />
+          ) : (
+            <CircleX className="size-4 text-red-600" />
           )}
-          <AccountId accountId={tx.signer_id} />
-        </span>
-      </td>
-      <td className="px-4 py-3">
-        <AccountId accountId={tx.receiver_id} />
-      </td>
-      <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">
-        <ActionList actions={tx.actions} />
-      </td>
-      <td className="whitespace-nowrap px-4 py-3 text-xs">
-        <GasAmount gas={tx.gas_burnt} />
-      </td>
-      <td className="whitespace-nowrap px-4 py-3">
-        {tx.is_success ? (
-          <CircleCheck className="size-4 text-green-600" />
-        ) : (
-          <CircleX className="size-4 text-red-600" />
-        )}
-      </td>
-    </tr>
+        </td>
+      </tr>
+      {hasTransfers && (
+        <tr className="border-b border-gray-100 group-hover:bg-gray-50">
+          <td colSpan={7} className="pb-2 pt-0 pl-10 pr-4">
+            <div className="flex flex-col gap-0.5 text-xs text-gray-600 dark:text-gray-400">
+              {tx.transfers.map((t, i) => (
+                <TransferSummary key={i} transfer={t} />
+              ))}
+            </div>
+          </td>
+        </tr>
+      )}
+    </tbody>
   );
 }
 
@@ -140,6 +155,13 @@ function TxMobileCard({ tx, timestamp }: TxTableItem) {
       <div className="text-xs text-gray-500 mt-0.5">
         <GasAmount gas={tx.gas_burnt} />
       </div>
+      {tx.transfers.length > 0 && (
+        <div className="flex flex-col gap-0.5 text-xs text-gray-600 dark:text-gray-400 mt-1 pt-1 border-t border-gray-100">
+          {tx.transfers.map((t, i) => (
+            <TransferSummary key={i} transfer={t} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -150,15 +172,13 @@ export function TxTable({ items }: { items: TxTableItem[] }) {
       <div className="hidden sm:block min-w-fit rounded-lg border border-gray-200 bg-surface">
         <table className="w-full text-sm">
           <TxTableHeader />
-          <tbody>
-            {items.map((item, i) => (
-              <TxRow
-                key={`${item.tx.hash}-${i}`}
-                tx={item.tx}
-                timestamp={item.timestamp}
-              />
-            ))}
-          </tbody>
+          {items.map((item, i) => (
+            <TxRow
+              key={`${item.tx.hash}-${i}`}
+              tx={item.tx}
+              timestamp={item.timestamp}
+            />
+          ))}
         </table>
       </div>
       <div className="sm:hidden rounded-lg border border-gray-200 bg-surface divide-y divide-gray-100">
