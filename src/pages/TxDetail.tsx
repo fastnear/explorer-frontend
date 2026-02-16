@@ -206,7 +206,9 @@ export default function TxDetail() {
   if (!tx) return <p className="text-gray-500">Loading transaction...</p>;
 
   const parsed = parseTransaction(tx);
-  const widgets = getMatchingWidgets(tx);
+  const allWidgets = getMatchingWidgets(tx);
+  const explanationWidgets = allWidgets.filter((w) => w.priority > 0);
+  const utilityWidgets = allWidgets.filter((w) => w.priority === 0);
 
   // Total gas and tokens burnt across all outcomes
   let totalGas = tx.execution_outcome.outcome.gas_burnt;
@@ -282,6 +284,10 @@ export default function TxDetail() {
         </dl>
       </div>
 
+      {explanationWidgets.map((w) => (
+        <w.component key={w.id} tx={tx} />
+      ))}
+
       {tx.receipts.length > 0 && (
         <div className="mb-6">
           <h2 className="mb-3 text-lg font-semibold">
@@ -295,7 +301,7 @@ export default function TxDetail() {
         </div>
       )}
 
-      {widgets.map((w) => (
+      {utilityWidgets.map((w) => (
         <w.component key={w.id} tx={tx} />
       ))}
     </div>

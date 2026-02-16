@@ -1,6 +1,8 @@
 import type { ComponentType } from "react";
 import type { TransactionDetail } from "../api/types";
 import DefaultTxWidget from "./DefaultTxWidget";
+import NearTransferWidget, { matchNearTransfer } from "./NearTransferWidget";
+import FtTransferWidget, { matchFtTransfer } from "./FtTransferWidget";
 
 export interface Widget {
   id: string;
@@ -10,6 +12,18 @@ export interface Widget {
 }
 
 const registry: Widget[] = [
+  {
+    id: "near-transfer",
+    match: matchNearTransfer,
+    component: NearTransferWidget,
+    priority: 10,
+  },
+  {
+    id: "ft-transfer",
+    match: matchFtTransfer,
+    component: FtTransferWidget,
+    priority: 10,
+  },
   {
     id: "default",
     match: () => true,
