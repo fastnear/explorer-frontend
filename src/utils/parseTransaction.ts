@@ -29,7 +29,7 @@ export interface ParsedTx {
   block_height: number;
   timestamp: string;
   gas_burnt: number;
-  is_success: boolean;
+  is_success: boolean | null; // null = pending
   actions: ParsedAction[];
   relayer_id?: string;
   transfers: TransferInfo[];
@@ -255,9 +255,27 @@ function extractTransfers(tx: TransactionDetail): TransferInfo[] {
   return transfers;
 }
 
-export function parseTransaction(tx: TransactionDetail): ParsedTx {
+function resolveSuccess(tx: TransactionDetail): boolean | null {
   const { status } = tx.execution_outcome.outcome;
-  const is_success = "SuccessValue" in status || "SuccessReceiptId" in status;
+  if ("Failure" in status) return false;
+  if ("SuccessValue" in status) return true;
+  if ("SuccessReceiptId" in status) {
+    const receiptId = status.SuccessReceiptId as string;
+    const receipt = tx.receipts.find(
+      (r) => r.receipt.receipt_id === receiptId,
+    );
+    if (!receipt) return null; // receipt not found → pending
+    const rStatus = receipt.execution_outcome.outcome.status;
+    if ("Failure" in rStatus) return false;
+    if ("SuccessValue" in rStatus) return true;
+    // SuccessReceiptId at receipt level — treat as success
+    if ("SuccessReceiptId" in rStatus) return true;
+  }
+  return null;
+}
+
+export function parseTransaction(tx: TransactionDetail): ParsedTx {
+  const is_success = resolveSuccess(tx);
 
   let totalGas = tx.execution_outcome.outcome.gas_burnt;
   for (const r of tx.receipts) {

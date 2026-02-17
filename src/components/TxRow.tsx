@@ -8,7 +8,7 @@ import AccountId from "./AccountId";
 import Action from "./Action";
 import TransferSummary from "./TransferSummary";
 import type { TransferInfo } from "../utils/parseTransaction";
-import { CircleCheck, CircleX, Radio } from "lucide-react";
+import { CircleCheck, CircleX, Clock, Radio } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const ACTIONS_LIMIT = 3;
@@ -116,7 +116,9 @@ export default function TxRow({ tx, timestamp }: TxTableItem) {
           <GasAmount gas={tx.gas_burnt} />
         </td>
         <td className="whitespace-nowrap px-4 py-3">
-          {tx.is_success ? (
+          {tx.is_success === null ? (
+            <Clock className="size-4 text-yellow-500" />
+          ) : tx.is_success ? (
             <CircleCheck className="size-4 text-green-600" />
           ) : (
             <CircleX className="size-4 text-red-600" />
@@ -141,7 +143,9 @@ function TxMobileCard({ tx, timestamp }: TxTableItem) {
     <div className="px-3 py-2.5">
       <div className="flex items-center justify-between gap-2 mb-1">
         <div className="flex items-center gap-1.5 min-w-0">
-          {tx.is_success ? (
+          {tx.is_success === null ? (
+            <Clock className="size-3.5 text-yellow-500 shrink-0" />
+          ) : tx.is_success ? (
             <CircleCheck className="size-3.5 text-green-600 shrink-0" />
           ) : (
             <CircleX className="size-3.5 text-red-600 shrink-0" />
