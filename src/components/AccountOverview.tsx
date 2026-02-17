@@ -8,6 +8,7 @@ import useTokenPrices, {
   computeUsdValue,
   type TokenPrice,
 } from "../hooks/useTokenPrices";
+import useSpamTokens, { isSpam } from "../hooks/useSpamTokens";
 import { TokenAmount } from "./TransferSummary";
 import NearAmount from "./NearAmount";
 import AccountId from "./AccountId";
@@ -37,10 +38,14 @@ function getTokenUsdValue(
 
 function FtTokenRow({ token }: { token: AccountFtToken }) {
   const { metadata, loading } = useTokenMetadata(token.contract_id);
+  const spamSet = useSpamTokens();
+  const spam = isSpam(spamSet, token.contract_id);
+
+  const spamClass = spam ? "opacity-50" : "";
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 py-1 text-sm">
+      <div className={`flex items-center gap-2 py-1 text-sm ${spamClass}`}>
         <Loader2 className="size-3 animate-spin text-gray-400" />
         <AccountId accountId={token.contract_id} />
       </div>
@@ -49,7 +54,7 @@ function FtTokenRow({ token }: { token: AccountFtToken }) {
 
   if (!metadata) {
     return (
-      <div className="flex items-center gap-2 py-1 text-sm">
+      <div className={`flex items-center gap-2 py-1 text-sm ${spamClass}`}>
         <span className="font-mono">{token.balance}</span>
         <AccountId accountId={token.contract_id} />
       </div>
@@ -57,7 +62,7 @@ function FtTokenRow({ token }: { token: AccountFtToken }) {
   }
 
   return (
-    <div className="flex items-center gap-2 py-1 text-sm">
+    <div className={`flex items-center gap-2 py-1 text-sm ${spamClass}`}>
       <TokenAmount
         amount={token.balance}
         meta={metadata}
@@ -130,16 +135,22 @@ function ExpandableList<T>({
 
 function useSortedTokens(
   data: AccountFullResponse | null,
-  prices: Map<string, TokenPrice> | null
+  prices: Map<string, TokenPrice> | null,
+  spamSet: Set<string> | null
 ): AccountFtToken[] {
   return useMemo(() => {
     if (!data) return [];
     const nonZero = data.tokens.filter(isNonZeroBalance);
-    if (!prices) return nonZero;
-    return [...nonZero].sort(
-      (a, b) => getTokenUsdValue(b, prices) - getTokenUsdValue(a, prices)
-    );
-  }, [data, prices]);
+    return [...nonZero].sort((a, b) => {
+      // Spam tokens always go to the bottom
+      const aSpam = isSpam(spamSet, a.contract_id);
+      const bSpam = isSpam(spamSet, b.contract_id);
+      if (aSpam !== bSpam) return aSpam ? 1 : -1;
+      // Then sort by USD value descending
+      if (!prices) return 0;
+      return getTokenUsdValue(b, prices) - getTokenUsdValue(a, prices);
+    });
+  }, [data, prices, spamSet]);
 }
 
 export default function AccountOverview({
@@ -153,7 +164,8 @@ export default function AccountOverview({
 }) {
   const [showZero, setShowZero] = useState(false);
   const { prices } = useTokenPrices();
-  const sortedTokens = useSortedTokens(data, prices);
+  const spamSet = useSpamTokens();
+  const sortedTokens = useSortedTokens(data, prices, spamSet);
 
   if (loading) {
     return (

@@ -10,9 +10,10 @@ import useTokenPrices, {
   computeUsdValue,
   formatUsd,
 } from "../hooks/useTokenPrices";
+import useSpamTokens, { isSpam } from "../hooks/useSpamTokens";
 import AccountId from "./AccountId";
 import NearAmount from "./NearAmount";
-import { CircleStop, Coins, Loader2 } from "lucide-react";
+import { CircleAlert, CircleStop, Coins, Loader2 } from "lucide-react";
 
 function formatTokenAmount(amount: string, decimals: number): string {
   if (amount === "0") return "0";
@@ -55,6 +56,8 @@ export function TokenAmount({
 }) {
   const [showRaw, setShowRaw] = useState(false);
   const { prices } = useTokenPrices();
+  const spamSet = useSpamTokens();
+  const spam = isSpam(spamSet, contractId ?? "");
   const priceInfo = getFtPrice(prices, contractId);
   const usdValue = priceInfo
     ? computeUsdValue(amount, priceInfo.decimals, priceInfo.price)
@@ -74,6 +77,7 @@ export function TokenAmount({
         ? `${amount} units ${symbol}`
         : `${formatTokenAmount(amount, meta.decimals)} ${symbol}`}
       {meta.icon && <TokenIcon src={meta.icon} alt={meta.symbol} />}
+      {spam && <span title="Flagged as spam"><CircleAlert className="inline-block size-3 shrink-0 text-red-500" /></span>}
       {!showRaw && usdValue > 0 && (
         <span className="text-gray-400 font-sans text-xs">{formatUsd(usdValue)}</span>
       )}
@@ -104,6 +108,8 @@ function MultiTokenAmount({
 }) {
   const [showRaw, setShowRaw] = useState(false);
   const { prices } = useTokenPrices();
+  const spamSet = useSpamTokens();
+  const spam = isSpam(spamSet, contractId ?? "");
   const priceInfo = getMtPrice(prices, contractId, tokenId);
   const usdValue = priceInfo
     ? computeUsdValue(amount, priceInfo.decimals, priceInfo.price)
@@ -127,6 +133,7 @@ function MultiTokenAmount({
         ? `${formatTokenAmount(amount, meta.decimals!)} ${label}`
         : `${amount} units ${label}`}
       {meta.media && <TokenIcon src={meta.media} alt={meta.title} />}
+      {spam && <span title="Flagged as spam"><CircleAlert className="inline-block size-3 shrink-0 text-red-500" /></span>}
       {!showRaw && usdValue > 0 && (
         <span className="text-gray-400 font-sans text-xs">{formatUsd(usdValue)}</span>
       )}
