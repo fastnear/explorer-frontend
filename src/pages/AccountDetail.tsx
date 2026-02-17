@@ -4,9 +4,11 @@ import { getAccount } from "../api/endpoints";
 import type { AccountTx } from "../api/types";
 import useTxDetails from "../hooks/useTxDetails";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
+import useAccountOverview from "../hooks/useAccountOverview";
 import { TxTable } from "../components/TxRow";
 import type { TxTableItem } from "../components/TxRow";
 import InfiniteScrollSentinel from "../components/InfiniteScrollSentinel";
+import AccountOverview from "../components/AccountOverview";
 
 const BATCH_SIZE = 80;
 
@@ -53,6 +55,7 @@ export default function AccountDetail() {
   }, [txns, aheadItems]);
 
   const { txMap } = useTxDetails(hashes, accountId);
+  const { data: overview, loading: overviewLoading, error: overviewError } = useAccountOverview(accountId);
 
   const txItems: TxTableItem[] = useMemo(
     () =>
@@ -72,6 +75,8 @@ export default function AccountDetail() {
       <h1 className="mb-4 text-xl font-bold">
         Account: <span className="font-mono text-base">{accountId}</span>
       </h1>
+
+      <AccountOverview data={overview} loading={overviewLoading} error={overviewError} />
 
       {totalCount > 0 && (
         <p className="mb-3 text-sm text-gray-600">

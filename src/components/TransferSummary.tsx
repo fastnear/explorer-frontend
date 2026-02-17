@@ -4,6 +4,12 @@ import useTokenMetadata, { type TokenMetadata } from "../hooks/useTokenMetadata"
 import useMultiTokenMetadata, {
   type MultiTokenMetadata,
 } from "../hooks/useMultiTokenMetadata";
+import useTokenPrices, {
+  getFtPrice,
+  getMtPrice,
+  computeUsdValue,
+  formatUsd,
+} from "../hooks/useTokenPrices";
 import AccountId from "./AccountId";
 import NearAmount from "./NearAmount";
 import { CircleStop, Coins, Loader2 } from "lucide-react";
@@ -48,6 +54,11 @@ export function TokenAmount({
   tokenId?: string;
 }) {
   const [showRaw, setShowRaw] = useState(false);
+  const { prices } = useTokenPrices();
+  const priceInfo = getFtPrice(prices, contractId);
+  const usdValue = priceInfo
+    ? computeUsdValue(amount, priceInfo.decimals, priceInfo.price)
+    : 0;
   const symbol = truncateSymbol(meta.symbol);
   return (
     <span
@@ -63,6 +74,9 @@ export function TokenAmount({
         ? `${amount} units ${symbol}`
         : `${formatTokenAmount(amount, meta.decimals)} ${symbol}`}
       {meta.icon && <TokenIcon src={meta.icon} alt={meta.symbol} />}
+      {!showRaw && usdValue > 0 && (
+        <span className="text-gray-400 font-sans text-xs">{formatUsd(usdValue)}</span>
+      )}
       {showRaw && contractId && (
         <>
           <AccountId accountId={contractId} />
@@ -89,6 +103,11 @@ function MultiTokenAmount({
   tokenId?: string;
 }) {
   const [showRaw, setShowRaw] = useState(false);
+  const { prices } = useTokenPrices();
+  const priceInfo = getMtPrice(prices, contractId, tokenId);
+  const usdValue = priceInfo
+    ? computeUsdValue(amount, priceInfo.decimals, priceInfo.price)
+    : 0;
   const label = truncateSymbol(meta.symbol ?? meta.title);
   const hasDecimals = meta.decimals != null && meta.decimals > 0;
   const clickable = hasDecimals || contractId;
@@ -108,6 +127,9 @@ function MultiTokenAmount({
         ? `${formatTokenAmount(amount, meta.decimals!)} ${label}`
         : `${amount} units ${label}`}
       {meta.media && <TokenIcon src={meta.media} alt={meta.title} />}
+      {!showRaw && usdValue > 0 && (
+        <span className="text-gray-400 font-sans text-xs">{formatUsd(usdValue)}</span>
+      )}
       {showRaw && contractId && (
         <>
           <AccountId accountId={contractId} />
