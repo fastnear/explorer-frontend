@@ -3,7 +3,7 @@ import { CircleAlert } from "lucide-react";
 import useSpamTokens, { isSpam } from "../hooks/useSpamTokens";
 import useSpamNfts, { isSpamNft } from "../hooks/useSpamNfts";
 
-const MAX_LEN = 30;
+const DEFAULT_MAX_LEN = 30;
 
 function SpamBadge() {
   return (
@@ -13,27 +13,40 @@ function SpamBadge() {
   );
 }
 
+/**
+ * @param maxLength - number of chars before truncating, or "auto" for
+ *   CSS-only truncation that fills available space. Defaults to 30.
+ */
 export default function AccountId({
   accountId,
   linked = true,
+  maxLength = DEFAULT_MAX_LEN,
 }: {
   accountId: string;
   linked?: boolean;
+  maxLength?: number | "auto";
 }) {
   const spamSet = useSpamTokens();
   const spamNfts = useSpamNfts();
   const spam = isSpam(spamSet, accountId) || isSpamNft(spamNfts, accountId);
-  const needsTruncate = accountId.length > MAX_LEN;
-  const cls = needsTruncate
-    ? "inline-block max-w-[36ch] overflow-hidden text-ellipsis whitespace-nowrap align-bottom font-mono text-xs text-blue-600 hover:underline"
-    : "whitespace-nowrap font-mono text-xs text-blue-600 hover:underline";
+
+  const auto = maxLength === "auto";
+  const needsTruncate = auto || accountId.length > maxLength;
+
+  const baseCls = "font-mono text-xs";
+  const truncateCls = auto
+    ? `${baseCls} inline-block min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap align-bottom`
+    : `${baseCls} inline-block max-w-[${maxLength + 6}ch] overflow-hidden text-ellipsis whitespace-nowrap align-bottom`;
+  const normalCls = `${baseCls} whitespace-nowrap`;
+
+  const innerCls = needsTruncate ? truncateCls : normalCls;
 
   if (linked) {
     return (
-      <span className="inline-flex items-center gap-0.5">
+      <span className={`inline-flex items-center gap-0.5 ${auto ? "min-w-0 max-w-full" : ""}`}>
         <Link
           to={`/account/${accountId}`}
-          className={cls}
+          className={`${innerCls} text-blue-600 hover:underline`}
           title={needsTruncate ? accountId : undefined}
         >
           {accountId}
@@ -44,11 +57,9 @@ export default function AccountId({
   }
 
   return (
-    <span className="inline-flex items-center gap-0.5">
+    <span className={`inline-flex items-center gap-0.5 ${auto ? "min-w-0 max-w-full" : ""}`}>
       <span
-        className={needsTruncate
-          ? "inline-block max-w-[36ch] overflow-hidden text-ellipsis whitespace-nowrap align-bottom font-mono text-xs"
-          : "whitespace-nowrap font-mono text-xs"}
+        className={innerCls}
         title={needsTruncate ? accountId : undefined}
       >
         {accountId}

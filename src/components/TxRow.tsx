@@ -132,11 +132,11 @@ export default function TxRow({ tx, timestamp }: TxTableItem) {
                 <Radio className="size-3.5 text-red-500" />
               </Link>
             )}
-            <AccountId accountId={tx.signer_id} />
+            <AccountId accountId={tx.signer_id} maxLength={20} />
           </span>
         </td>
         <td className="px-4 py-3">
-          <AccountId accountId={tx.receiver_id} />
+          <AccountId accountId={tx.receiver_id} maxLength={20} />
         </td>
         <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">
           <ActionList actions={tx.actions} />
@@ -200,11 +200,11 @@ function TxMobileCard({ tx, timestamp }: TxTableItem) {
               <Radio className="size-3 text-red-500" />
             </Link>
           )}
-          <AccountId accountId={tx.signer_id} />
+          <AccountId accountId={tx.signer_id} maxLength="auto" />
         </span>
-        <span className="inline-flex items-center gap-1">
+        <span className="inline-flex items-center gap-1 min-w-0">
           <span className="text-gray-400">→</span>
-          <AccountId accountId={tx.receiver_id} />
+          <AccountId accountId={tx.receiver_id} maxLength="auto" />
         </span>
       </div>
       <div className="text-xs text-gray-500 mt-0.5">
