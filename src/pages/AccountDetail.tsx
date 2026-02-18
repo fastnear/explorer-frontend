@@ -5,7 +5,7 @@ import type { AccountTx } from "../api/types";
 import useTxDetails from "../hooks/useTxDetails";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import useAccountOverview from "../hooks/useAccountOverview";
-import { TxTable } from "../components/TxRow";
+import { FilteredTxTable } from "../components/TxRow";
 import type { TxTableItem } from "../components/TxRow";
 import InfiniteScrollSentinel from "../components/InfiniteScrollSentinel";
 import AccountOverview from "../components/AccountOverview";
@@ -84,7 +84,7 @@ export default function AccountDetail() {
         </p>
       )}
 
-      <TxTable items={txItems} />
+      <FilteredTxTable items={txItems} />
 
       <InfiniteScrollSentinel
         onLoadMore={loadMore}

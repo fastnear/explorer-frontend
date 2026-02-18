@@ -8,7 +8,7 @@ import AccountId from "../components/AccountId";
 import TimeAgo from "../components/TimeAgo";
 import InfiniteScrollSentinel from "../components/InfiniteScrollSentinel";
 import useTxDetails from "../hooks/useTxDetails";
-import { TxTable } from "../components/TxRow";
+import { FilteredTxTable } from "../components/TxRow";
 import type { TxTableItem } from "../components/TxRow";
 import GasAmount from "../components/GasAmount";
 import NearAmount from "../components/NearAmount";
@@ -148,8 +148,10 @@ export default function BlockDetail() {
 
       {txs.length > 0 && (
         <>
-          <h2 className="mb-3 text-lg font-semibold">Transactions</h2>
-          <TxTable items={txItems} />
+          <p className="mb-3 text-sm text-gray-600">
+            Transactions ({block.num_transactions.toLocaleString()})
+          </p>
+          <FilteredTxTable items={txItems} />
           <InfiniteScrollSentinel
             onLoadMore={loadMore}
             hasMore={hasMore}

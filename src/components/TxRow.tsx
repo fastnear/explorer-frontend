@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { ParsedTx } from "../utils/parseTransaction";
 import type { ParsedAction } from "../utils/parseTransaction";
 import GasAmount from "./GasAmount";
@@ -8,8 +8,10 @@ import AccountId from "./AccountId";
 import Action from "./Action";
 import TransferSummary, { NftTransferSummary } from "./TransferSummary";
 import type { TransferInfo, NftTransferInfo } from "../utils/parseTransaction";
-import { CircleCheck, CircleX, Clock, Radio } from "lucide-react";
+import { CircleCheck, CircleX, Clock, Filter, Radio } from "lucide-react";
 import { Link } from "react-router-dom";
+import useSpamTokens, { isSpam } from "../hooks/useSpamTokens";
+import useSpamNfts, { isSpamNft } from "../hooks/useSpamNfts";
 
 const ACTIONS_LIMIT = 3;
 const TRANSFERS_LIMIT = 3;
@@ -234,6 +236,100 @@ export function TxTable({ items }: { items: TxTableItem[] }) {
       </div>
       <div className="sm:hidden rounded-lg border border-gray-200 bg-surface divide-y divide-gray-100">
         {items.map((item, i) => (
+          <TxMobileCard
+            key={`${item.tx.hash}-${i}`}
+            tx={item.tx}
+            timestamp={item.timestamp}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
+
+function SpamFilterBar({
+  spamCount,
+  showSpam,
+  setShowSpam,
+}: {
+  spamCount: number;
+  showSpam: boolean;
+  setShowSpam: (v: boolean) => void;
+}) {
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  return (
+    <div className="border-b border-gray-200">
+      <div className="flex items-center justify-between gap-2 px-4 py-2 text-sm">
+        <span className="text-gray-400 text-xs">
+          {spamCount > 0 ? `Hiding ${spamCount} spam transaction${spamCount === 1 ? "" : "s"}` : "Hiding spam transactions"}
+        </span>
+        <button
+          onClick={() => setFiltersOpen((o) => !o)}
+          className="inline-flex cursor-pointer items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+        >
+          <Filter className="size-3.5" />
+          Filter
+        </button>
+      </div>
+      {filtersOpen && (
+        <div className="border-t border-gray-100 bg-gray-50 px-4 py-2 text-sm">
+          <label className="inline-flex cursor-pointer items-center gap-2">
+            <input
+              type="checkbox"
+              checked={showSpam}
+              onChange={(e) => setShowSpam(e.target.checked)}
+              className="rounded"
+            />
+            Show spam transactions
+          </label>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function FilteredTxTable({ items }: { items: TxTableItem[] }) {
+  const [showSpam, setShowSpam] = useState(false);
+  const spamTokens = useSpamTokens();
+  const spamNfts = useSpamNfts();
+
+  const { filtered, spamCount } = useMemo(() => {
+    if (showSpam) return { filtered: items, spamCount: 0 };
+    let spamCount = 0;
+    const filtered = items.filter((item) => {
+      const { signer_id, receiver_id } = item.tx;
+      const spam =
+        isSpam(spamTokens, signer_id) ||
+        isSpam(spamTokens, receiver_id) ||
+        isSpamNft(spamNfts, signer_id) ||
+        isSpamNft(spamNfts, receiver_id);
+      if (spam) spamCount++;
+      return !spam;
+    });
+    return { filtered, spamCount };
+  }, [items, showSpam, spamTokens, spamNfts]);
+
+  const bar = <SpamFilterBar spamCount={spamCount} showSpam={showSpam} setShowSpam={setShowSpam} />;
+
+  return (
+    <>
+      <div className="hidden sm:block min-w-fit rounded-lg border border-gray-200 bg-surface">
+        {bar}
+        <table className="w-full text-sm">
+          <TxTableHeader />
+          {filtered.map((item, i) => (
+            <TxRow
+              key={`${item.tx.hash}-${i}`}
+              tx={item.tx}
+              timestamp={item.timestamp}
+            />
+          ))}
+        </table>
+      </div>
+      <div className="sm:hidden rounded-lg border border-gray-200 bg-surface divide-y divide-gray-100">
+        {bar}
+        {filtered.map((item, i) => (
           <TxMobileCard
             key={`${item.tx.hash}-${i}`}
             tx={item.tx}
