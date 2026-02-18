@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import type {
   AccountFullResponse,
   AccountFtToken,
+  AccountNft,
 } from "../api/fastnearApi";
 import useTokenMetadata from "../hooks/useTokenMetadata";
 import useTokenPrices, {
@@ -154,6 +155,120 @@ function useSortedTokens(
   }, [data, prices, spamSet]);
 }
 
+function TokenList({
+  tokens,
+  spamTokens,
+  zeroTokens,
+}: {
+  tokens: AccountFtToken[];
+  spamTokens: AccountFtToken[];
+  zeroTokens: AccountFtToken[];
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [showSpam, setShowSpam] = useState(false);
+  const [showZero, setShowZero] = useState(false);
+  const visible = expanded ? tokens : tokens.slice(0, VISIBLE_LIMIT);
+  const hiddenCount = tokens.length - VISIBLE_LIMIT;
+
+  return (
+    <>
+      <div>
+        {visible.map((token) => (
+          <FtTokenRow key={token.contract_id} token={token} />
+        ))}
+      </div>
+      {hiddenCount > 0 && !expanded && (
+        <button
+          className="mt-1 text-sm text-blue-600 hover:underline"
+          onClick={() => setExpanded(true)}
+        >
+          + {hiddenCount} more
+        </button>
+      )}
+      {expanded && spamTokens.length > 0 && !showSpam && (
+        <button
+          className="mt-1 block text-sm text-gray-400 hover:text-gray-600"
+          onClick={() => setShowSpam(true)}
+        >
+          + {spamTokens.length} spam token{spamTokens.length !== 1 ? "s" : ""}
+        </button>
+      )}
+      {showSpam && (
+        <div>
+          {spamTokens.map((token) => (
+            <FtTokenRow key={token.contract_id} token={token} />
+          ))}
+        </div>
+      )}
+      {expanded && zeroTokens.length > 0 && !showZero && (
+        <button
+          className="mt-1 block text-sm text-gray-400 hover:text-gray-600"
+          onClick={() => setShowZero(true)}
+        >
+          + {zeroTokens.length} zero-balance token{zeroTokens.length !== 1 ? "s" : ""}
+        </button>
+      )}
+      {showZero && (
+        <div>
+          {zeroTokens.map((token) => (
+            <FtTokenRow key={token.contract_id} token={token} />
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+function NftList({
+  nfts,
+  spamNfts,
+}: {
+  nfts: AccountNft[];
+  spamNfts: AccountNft[];
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [showSpam, setShowSpam] = useState(false);
+  const visible = expanded ? nfts : nfts.slice(0, VISIBLE_LIMIT);
+  const hiddenCount = nfts.length - VISIBLE_LIMIT;
+
+  return (
+    <>
+      <div>
+        {visible.map((nft) => (
+          <div key={nft.contract_id} className="py-0.5">
+            <AccountId accountId={nft.contract_id} />
+          </div>
+        ))}
+      </div>
+      {hiddenCount > 0 && !expanded && (
+        <button
+          className="mt-1 text-sm text-blue-600 hover:underline"
+          onClick={() => setExpanded(true)}
+        >
+          + {hiddenCount} more
+        </button>
+      )}
+      {expanded && spamNfts.length > 0 && !showSpam && (
+        <button
+          className="mt-1 block text-sm text-gray-400 hover:text-gray-600"
+          onClick={() => setShowSpam(true)}
+        >
+          + {spamNfts.length} spam NFT contract{spamNfts.length !== 1 ? "s" : ""}
+        </button>
+      )}
+      {showSpam && (
+        <div>
+          {spamNfts.map((nft) => (
+            <div key={nft.contract_id} className="py-0.5 opacity-50">
+              <AccountId accountId={nft.contract_id} />
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
 export default function AccountOverview({
   data,
   loading,
@@ -163,20 +278,31 @@ export default function AccountOverview({
   loading: boolean;
   error: string | null;
 }) {
-  const [showZero, setShowZero] = useState(false);
   const { prices } = useTokenPrices();
   const spamSet = useSpamTokens();
   const spamNfts = useSpamNfts();
   const sortedTokens = useSortedTokens(data, prices, spamSet);
-  const sortedNfts = useMemo(() => {
-    if (!data || !spamNfts) return data?.nfts ?? [];
-    return [...data.nfts].sort((a, b) => {
-      const aSpam = isSpamNft(spamNfts, a.contract_id);
-      const bSpam = isSpamNft(spamNfts, b.contract_id);
-      if (aSpam !== bSpam) return aSpam ? 1 : -1;
-      return 0;
-    });
+  const { nftsClean, nftsSpam } = useMemo(() => {
+    const nfts = data?.nfts ?? [];
+    if (!spamNfts) return { nftsClean: nfts, nftsSpam: [] as typeof nfts };
+    const clean: typeof nfts = [];
+    const spam: typeof nfts = [];
+    for (const nft of nfts) {
+      if (isSpamNft(spamNfts, nft.contract_id)) spam.push(nft);
+      else clean.push(nft);
+    }
+    return { nftsClean: clean, nftsSpam: spam };
   }, [data, spamNfts]);
+  const { tokensClean, tokensSpam } = useMemo(() => {
+    if (!spamSet) return { tokensClean: sortedTokens, tokensSpam: [] as AccountFtToken[] };
+    const clean: AccountFtToken[] = [];
+    const spam: AccountFtToken[] = [];
+    for (const t of sortedTokens) {
+      if (isSpam(spamSet, t.contract_id)) spam.push(t);
+      else clean.push(t);
+    }
+    return { tokensClean: clean, tokensSpam: spam };
+  }, [sortedTokens, spamSet]);
 
   if (loading) {
     return (
@@ -208,7 +334,6 @@ export default function AccountOverview({
   }
 
   const zeroTokens = tokens.filter((t) => !isNonZeroBalance(t));
-  const zeroCount = zeroTokens.length;
 
   return (
     <div className="mb-6 space-y-3 rounded-lg border border-gray-200 bg-surface px-4 py-4 text-sm">
@@ -230,74 +355,48 @@ export default function AccountOverview({
         </div>
       </dl>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 [&>div]:border-t [&>div]:border-gray-100 [&>div]:px-1 [&>div]:py-3">
-        {/* Tokens */}
-        <CollapsibleSection
-          icon={<Coins className="size-4" />}
-          title="Tokens"
-          count={sortedTokens.length + zeroCount}
-        >
-          <ExpandableList
-            items={sortedTokens}
-            renderItem={(token) => (
-              <FtTokenRow key={token.contract_id} token={token} />
-            )}
-          />
-          {zeroCount > 0 && (
-            <div className="mt-2 border-t border-gray-100 pt-2">
-              <button
-                className="text-sm text-gray-400 hover:text-gray-600"
-                onClick={() => setShowZero(!showZero)}
-              >
-                {showZero ? "Hide" : "Show"} {zeroCount} zero-balance token{zeroCount !== 1 ? "s" : ""}
-              </button>
-              {showZero && (
-                <ExpandableList
-                  items={zeroTokens}
-                  renderItem={(token) => (
-                    <FtTokenRow key={token.contract_id} token={token} />
-                  )}
-                />
-              )}
-            </div>
-          )}
-        </CollapsibleSection>
+      <div className="sm:columns-2 sm:gap-0">
+        <div className="break-inside-avoid border-t border-gray-100 px-1 py-3">
+          <CollapsibleSection
+            icon={<Coins className="size-4" />}
+            title="Tokens"
+            count={sortedTokens.length + zeroTokens.length}
+          >
+            <TokenList
+              tokens={tokensClean}
+              spamTokens={tokensSpam}
+              zeroTokens={zeroTokens}
+            />
+          </CollapsibleSection>
+        </div>
 
-        {/* NFT Contracts */}
-        <CollapsibleSection
-          icon={<Image className="size-4" />}
-          title="NFT Contracts"
-          count={sortedNfts.length}
-        >
-          <ExpandableList
-            items={sortedNfts}
-            renderItem={(nft) => {
-              const spam = isSpamNft(spamNfts, nft.contract_id);
-              return (
-                <div key={nft.contract_id} className={`py-0.5${spam ? " opacity-50" : ""}`}>
-                  <AccountId accountId={nft.contract_id} />
+        <div className="break-inside-avoid border-t border-gray-100 px-1 py-3">
+          <CollapsibleSection
+            icon={<Image className="size-4" />}
+            title="NFT Contracts"
+            count={nftsClean.length + nftsSpam.length}
+          >
+            <NftList nfts={nftsClean} spamNfts={nftsSpam} />
+          </CollapsibleSection>
+        </div>
+
+        <div className="break-inside-avoid border-t border-gray-100 px-1 py-3">
+          <CollapsibleSection
+            icon={<Landmark className="size-4" />}
+            title="Staking Pools"
+            count={pools.length}
+            defaultOpen={pools.length > 0}
+          >
+            <ExpandableList
+              items={pools}
+              renderItem={(pool) => (
+                <div key={pool.pool_id} className="py-0.5">
+                  <AccountId accountId={pool.pool_id} />
                 </div>
-              );
-            }}
-          />
-        </CollapsibleSection>
-
-        {/* Staking Pools */}
-        <CollapsibleSection
-          icon={<Landmark className="size-4" />}
-          title="Staking Pools"
-          count={pools.length}
-          defaultOpen={pools.length > 0}
-        >
-          <ExpandableList
-            items={pools}
-            renderItem={(pool) => (
-              <div key={pool.pool_id} className="py-0.5">
-                <AccountId accountId={pool.pool_id} />
-              </div>
-            )}
-          />
-        </CollapsibleSection>
+              )}
+            />
+          </CollapsibleSection>
+        </div>
       </div>
     </div>
   );
