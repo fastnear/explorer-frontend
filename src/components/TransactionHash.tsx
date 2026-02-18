@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { ScrollText } from "lucide-react";
 
 export default function TransactionHash({
   hash,
@@ -10,9 +11,12 @@ export default function TransactionHash({
   return (
     <Link
       to={`/tx/${hash}`}
-      className="font-mono text-xs text-blue-600 hover:underline"
+      className="inline-flex items-center gap-1 font-mono text-xs text-gray-700 hover:underline"
     >
-      {truncate ? `${hash.slice(0, 12)}...` : <span className="break-all">{hash}</span>}
+      <ScrollText className="size-3.5 shrink-0 text-gray-400" />
+      {truncate ? (
+        <span className="inline-block max-w-[10ch] overflow-hidden text-ellipsis whitespace-nowrap align-bottom">{hash}</span>
+      ) : <span className="break-all">{hash}</span>}
     </Link>
   );
 }
