@@ -341,12 +341,12 @@ export default function AccountOverview({
       <dl className="grid gap-px sm:grid-cols-2 [&>div]:flex [&>div]:min-w-0 [&>div]:gap-2 [&>div]:py-1">
         <div>
           <dt className="shrink-0 text-gray-500">Balance</dt>
-          <dd><NearAmount yoctoNear={state.balance} /></dd>
+          <dd><NearAmount yoctoNear={state.balance} showPrice /></dd>
         </div>
         {state.locked !== "0" && (
           <div>
             <dt className="shrink-0 text-gray-500">Locked (Staked)</dt>
-            <dd><NearAmount yoctoNear={state.locked} /></dd>
+            <dd><NearAmount yoctoNear={state.locked} showPrice /></dd>
           </div>
         )}
         <div>
