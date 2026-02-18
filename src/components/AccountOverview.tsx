@@ -79,17 +79,19 @@ function CollapsibleSection({
   title,
   count,
   defaultOpen = true,
+  hidden = false,
   children,
 }: {
   icon: React.ReactNode;
   title: string;
   count: number;
   defaultOpen?: boolean;
+  hidden?: boolean;
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(defaultOpen);
 
-  if (count === 0) return null;
+  if (hidden) return null;
 
   return (
     <div>
@@ -185,7 +187,7 @@ function TokenList({
           + {hiddenCount} more
         </button>
       )}
-      {(expanded || tokens.length === 0) && spamTokens.length > 0 && !showSpam && (
+      {(expanded || tokens.length <= VISIBLE_LIMIT) && spamTokens.length > 0 && !showSpam && (
         <button
           className="mt-1 block text-sm text-gray-400 hover:text-gray-600"
           onClick={() => setShowSpam(true)}
@@ -200,7 +202,7 @@ function TokenList({
           ))}
         </div>
       )}
-      {(expanded || tokens.length === 0) && zeroTokens.length > 0 && !showZero && (
+      {(expanded || tokens.length <= VISIBLE_LIMIT) && zeroTokens.length > 0 && !showZero && (
         <button
           className="mt-1 block text-sm text-gray-400 hover:text-gray-600"
           onClick={() => setShowZero(true)}
@@ -248,7 +250,7 @@ function NftList({
           + {hiddenCount} more
         </button>
       )}
-      {(expanded || nfts.length === 0) && spamNfts.length > 0 && !showSpam && (
+      {(expanded || nfts.length <= VISIBLE_LIMIT) && spamNfts.length > 0 && !showSpam && (
         <button
           className="mt-1 block text-sm text-gray-400 hover:text-gray-600"
           onClick={() => setShowSpam(true)}
@@ -360,7 +362,8 @@ export default function AccountOverview({
           <CollapsibleSection
             icon={<Coins className="size-4" />}
             title="Tokens"
-            count={sortedTokens.length + zeroTokens.length}
+            count={tokensClean.length + tokensSpam.length + zeroTokens.length}
+            hidden={tokensClean.length === 0 && tokensSpam.length === 0 && zeroTokens.length === 0}
           >
             <TokenList
               tokens={tokensClean}
@@ -375,6 +378,7 @@ export default function AccountOverview({
             icon={<Image className="size-4" />}
             title="NFT Contracts"
             count={nftsClean.length + nftsSpam.length}
+            hidden={nftsClean.length === 0 && nftsSpam.length === 0}
           >
             <NftList nfts={nftsClean} spamNfts={nftsSpam} />
           </CollapsibleSection>
