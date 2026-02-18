@@ -4,13 +4,6 @@ import useSpamTokens, { isSpam } from "../hooks/useSpamTokens";
 import useSpamNfts, { isSpamNft } from "../hooks/useSpamNfts";
 
 const MAX_LEN = 30;
-const TAIL_LEN = 7;
-
-function truncate(id: string): string {
-  if (id.length <= MAX_LEN) return id;
-  const headLen = MAX_LEN - TAIL_LEN - 1; // 1 for ellipsis
-  return `${id.slice(0, headLen)}…${id.slice(-TAIL_LEN)}`;
-}
 
 function SpamBadge() {
   return (
@@ -30,18 +23,20 @@ export default function AccountId({
   const spamSet = useSpamTokens();
   const spamNfts = useSpamNfts();
   const spam = isSpam(spamSet, accountId) || isSpamNft(spamNfts, accountId);
-  const display = truncate(accountId);
-  const title = accountId.length > MAX_LEN ? accountId : undefined;
+  const needsTruncate = accountId.length > MAX_LEN;
+  const cls = needsTruncate
+    ? "inline-block max-w-[36ch] overflow-hidden text-ellipsis whitespace-nowrap align-bottom font-mono text-xs text-blue-600 hover:underline"
+    : "whitespace-nowrap font-mono text-xs text-blue-600 hover:underline";
 
   if (linked) {
     return (
       <span className="inline-flex items-center gap-0.5">
         <Link
           to={`/account/${accountId}`}
-          className="whitespace-nowrap font-mono text-xs text-blue-600 hover:underline"
-          title={title}
+          className={cls}
+          title={needsTruncate ? accountId : undefined}
         >
-          {display}
+          {accountId}
         </Link>
         {spam && <SpamBadge />}
       </span>
@@ -50,8 +45,13 @@ export default function AccountId({
 
   return (
     <span className="inline-flex items-center gap-0.5">
-      <span className="whitespace-nowrap font-mono text-xs" title={title}>
-        {display}
+      <span
+        className={needsTruncate
+          ? "inline-block max-w-[36ch] overflow-hidden text-ellipsis whitespace-nowrap align-bottom font-mono text-xs"
+          : "whitespace-nowrap font-mono text-xs"}
+        title={needsTruncate ? accountId : undefined}
+      >
+        {accountId}
       </span>
       {spam && <SpamBadge />}
     </span>
