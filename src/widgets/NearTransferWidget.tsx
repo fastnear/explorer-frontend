@@ -26,9 +26,11 @@ export default function NearTransferWidget({
     <WidgetCard
       icon={<ArrowRight className="size-4 text-blue-500" />}
       className={
-        parsed.is_success
-          ? "border-green-200 bg-green-50/50 dark:border-green-900 dark:bg-green-950/30"
-          : "border-red-200 bg-red-50/50 dark:border-red-900 dark:bg-red-950/30"
+        parsed.is_success === null
+          ? "border-yellow-200 bg-yellow-50/50 dark:border-yellow-900 dark:bg-yellow-950/30"
+          : parsed.is_success
+            ? "border-green-200 bg-green-50/50 dark:border-green-900 dark:bg-green-950/30"
+            : "border-red-200 bg-red-50/50 dark:border-red-900 dark:bg-red-950/30"
       }
     >
       <span className="flex flex-wrap items-center gap-1">

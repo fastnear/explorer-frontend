@@ -15,7 +15,7 @@ import TransferSummary from "../components/TransferSummary";
 import Base64Data from "../components/Base64Data";
 import JsonView from "@uiw/react-json-view";
 import { darkTheme } from "@uiw/react-json-view/dark";
-import { CircleCheck, CircleX, Radio } from "lucide-react";
+import { CircleCheck, CircleX, Clock, Radio } from "lucide-react";
 
 function useIsDark() {
   const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
@@ -232,7 +232,9 @@ export default function TxDetail() {
                 <TransactionHash hash={tx.transaction.hash} truncate={false} />
               </span>
               <span className="flex shrink-0 items-center gap-1">
-                {parsed.is_success ? (
+                {parsed.is_success === null ? (
+                  <Clock className="size-3.5 text-yellow-500" />
+                ) : parsed.is_success ? (
                   <CircleCheck className="size-3.5 text-green-600" />
                 ) : (
                   <CircleX className="size-3.5 text-red-600" />

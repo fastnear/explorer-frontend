@@ -17,7 +17,9 @@ export interface TransferInfo {
   from: string | null; // null = minted (no sender)
   to: string | null; // null = burned (no recipient)
   amount: string;
-  tokenContractId: string | null; // null = native NEAR
+  tokenType: "near" | "nep141" | "nep245";
+  contractId?: string; // FT contract for nep141, MT contract for nep245
+  tokenId?: string; // raw token_id within NEP-245 contract (e.g. "nep141:wrap.near" or native "42")
 }
 
 export interface ParsedTx {
@@ -27,7 +29,7 @@ export interface ParsedTx {
   block_height: number;
   timestamp: string;
   gas_burnt: number;
-  is_success: boolean;
+  is_success: boolean | null; // null = pending
   actions: ParsedAction[];
   relayer_id?: string;
   transfers: TransferInfo[];
@@ -102,6 +104,7 @@ function getTransferDeposit(action: TransactionAction): string | undefined {
   return undefined;
 }
 
+
 function extractTransfers(tx: TransactionDetail): TransferInfo[] {
   const transfers: TransferInfo[] = [];
 
@@ -129,7 +132,7 @@ function extractTransfers(tx: TransactionDetail): TransferInfo[] {
         from: signer,
         to: receiver,
         amount: deposit,
-        tokenContractId: null,
+        tokenType: "near",
       });
     }
   }
@@ -156,44 +159,91 @@ function extractTransfers(tx: TransactionDetail): TransferInfo[] {
             from: receiver,
             to: beneficiary,
             amount: deposit,
-            tokenContractId: null,
+            tokenType: "near",
           });
         }
       }
     }
   }
 
-  // 3. NEP-141 events from receipt logs (ft_transfer, ft_mint, ft_burn)
+  // 3. Event logs from all receipts (NEP-141 and NEP-245)
   for (const r of tx.receipts) {
-    const contractId = r.receipt.receiver_id;
+    const receiptContractId = r.receipt.receiver_id;
     for (const log of r.execution_outcome.outcome.logs) {
       if (!log.startsWith("EVENT_JSON:")) continue;
       try {
         const evt = JSON.parse(log.slice(11));
-        if (evt.standard !== "nep141") continue;
-        for (const d of evt.data ?? []) {
-          if (!d.amount || d.amount === "0") continue;
-          if (evt.event === "ft_transfer") {
-            transfers.push({
-              from: d.old_owner_id ?? "",
-              to: d.new_owner_id ?? "",
-              amount: d.amount,
-              tokenContractId: contractId,
-            });
-          } else if (evt.event === "ft_mint") {
-            transfers.push({
-              from: null,
-              to: d.owner_id ?? "",
-              amount: d.amount,
-              tokenContractId: contractId,
-            });
-          } else if (evt.event === "ft_burn") {
-            transfers.push({
-              from: d.owner_id ?? "",
-              to: null,
-              amount: d.amount,
-              tokenContractId: contractId,
-            });
+
+        // NEP-141 single-token events
+        if (evt.standard === "nep141") {
+          for (const d of evt.data ?? []) {
+            if (!d.amount || d.amount === "0") continue;
+            if (evt.event === "ft_transfer") {
+              transfers.push({
+                from: d.old_owner_id ?? "",
+                to: d.new_owner_id ?? "",
+                amount: d.amount,
+                tokenType: "nep141",
+                contractId: receiptContractId,
+              });
+            } else if (evt.event === "ft_mint") {
+              transfers.push({
+                from: null,
+                to: d.owner_id ?? "",
+                amount: d.amount,
+                tokenType: "nep141",
+                contractId: receiptContractId,
+              });
+            } else if (evt.event === "ft_burn") {
+              transfers.push({
+                from: d.owner_id ?? "",
+                to: null,
+                amount: d.amount,
+                tokenType: "nep141",
+                contractId: receiptContractId,
+              });
+            }
+          }
+        }
+
+        // NEP-245 multi-token events
+        if (evt.standard === "nep245") {
+          for (const d of evt.data ?? []) {
+            const tokenIds: string[] = d.token_ids ?? [];
+            const amounts: string[] = d.amounts ?? [];
+            for (let j = 0; j < tokenIds.length; j++) {
+              const amount = amounts[j];
+              if (!amount || amount === "0") continue;
+              const rawTokenId = tokenIds[j];
+              if (evt.event === "mt_transfer") {
+                transfers.push({
+                  from: d.old_owner_id ?? "",
+                  to: d.new_owner_id ?? "",
+                  amount,
+                  tokenType: "nep245",
+                  contractId: receiptContractId,
+                  tokenId: rawTokenId,
+                });
+              } else if (evt.event === "mt_mint") {
+                transfers.push({
+                  from: null,
+                  to: d.owner_id ?? "",
+                  amount,
+                  tokenType: "nep245",
+                  contractId: receiptContractId,
+                  tokenId: rawTokenId,
+                });
+              } else if (evt.event === "mt_burn") {
+                transfers.push({
+                  from: d.owner_id ?? "",
+                  to: null,
+                  amount,
+                  tokenType: "nep245",
+                  contractId: receiptContractId,
+                  tokenId: rawTokenId,
+                });
+              }
+            }
           }
         }
       } catch {
@@ -205,9 +255,27 @@ function extractTransfers(tx: TransactionDetail): TransferInfo[] {
   return transfers;
 }
 
-export function parseTransaction(tx: TransactionDetail): ParsedTx {
+function resolveSuccess(tx: TransactionDetail): boolean | null {
   const { status } = tx.execution_outcome.outcome;
-  const is_success = "SuccessValue" in status || "SuccessReceiptId" in status;
+  if ("Failure" in status) return false;
+  if ("SuccessValue" in status) return true;
+  if ("SuccessReceiptId" in status) {
+    const receiptId = status.SuccessReceiptId as string;
+    const receipt = tx.receipts.find(
+      (r) => r.receipt.receipt_id === receiptId,
+    );
+    if (!receipt) return null; // receipt not found → pending
+    const rStatus = receipt.execution_outcome.outcome.status;
+    if ("Failure" in rStatus) return false;
+    if ("SuccessValue" in rStatus) return true;
+    // SuccessReceiptId at receipt level — treat as success
+    if ("SuccessReceiptId" in rStatus) return true;
+  }
+  return null;
+}
+
+export function parseTransaction(tx: TransactionDetail): ParsedTx {
+  const is_success = resolveSuccess(tx);
 
   let totalGas = tx.execution_outcome.outcome.gas_burnt;
   for (const r of tx.receipts) {

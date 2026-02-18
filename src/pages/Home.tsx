@@ -1,19 +1,19 @@
 import { useCallback } from "react";
 import { getBlocks } from "../api/endpoints";
 import type { BlockHeader } from "../api/types";
-import usePagedCache from "../hooks/usePagedCache";
+import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import BlockHeight from "../components/BlockHeight";
 import AccountId from "../components/AccountId";
-import Pagination from "../components/Pagination";
+import InfiniteScrollSentinel from "../components/InfiniteScrollSentinel";
 import TimeAgo from "../components/TimeAgo";
 
-const PAGE_SIZE = 20;
+const BATCH_SIZE = 80;
 
 export default function Home() {
   const fetchPage = useCallback(
     async (resumeToken?: string, limit?: number) => {
       const data = await getBlocks({
-        limit: limit ?? PAGE_SIZE,
+        limit: limit ?? BATCH_SIZE,
         desc: true,
         to_block_height: resumeToken ? Number(resumeToken) : undefined,
       });
@@ -34,17 +34,14 @@ export default function Home() {
 
   const {
     items: blocks,
-    currentPage,
-    hasNext,
-    hasPrev,
-    goFirst,
-    goNext,
-    goPrev,
+    hasMore,
+    loadMore,
     loading,
+    loadingMore,
     error,
-  } = usePagedCache<BlockHeader>({
+  } = useInfiniteScroll<BlockHeader>({
     fetchPage,
-    pageSize: PAGE_SIZE,
+    batchSize: BATCH_SIZE,
     key: "blocks",
   });
 
@@ -114,14 +111,11 @@ export default function Home() {
           </div>
         ))}
       </div>
-      <Pagination
-        currentPage={currentPage}
-        hasNext={hasNext}
-        hasPrev={hasPrev}
-        goFirst={goFirst}
-        goPrev={goPrev}
-        goNext={goNext}
-        nextBusy={loading}
+      <InfiniteScrollSentinel
+        onLoadMore={loadMore}
+        hasMore={hasMore}
+        disabled={loading}
+        loadingMore={loadingMore}
       />
     </div>
   );
