@@ -185,7 +185,7 @@ function TokenList({
           + {hiddenCount} more
         </button>
       )}
-      {expanded && spamTokens.length > 0 && !showSpam && (
+      {(expanded || tokens.length === 0) && spamTokens.length > 0 && !showSpam && (
         <button
           className="mt-1 block text-sm text-gray-400 hover:text-gray-600"
           onClick={() => setShowSpam(true)}
@@ -200,7 +200,7 @@ function TokenList({
           ))}
         </div>
       )}
-      {expanded && zeroTokens.length > 0 && !showZero && (
+      {(expanded || tokens.length === 0) && zeroTokens.length > 0 && !showZero && (
         <button
           className="mt-1 block text-sm text-gray-400 hover:text-gray-600"
           onClick={() => setShowZero(true)}
@@ -248,7 +248,7 @@ function NftList({
           + {hiddenCount} more
         </button>
       )}
-      {expanded && spamNfts.length > 0 && !showSpam && (
+      {(expanded || nfts.length === 0) && spamNfts.length > 0 && !showSpam && (
         <button
           className="mt-1 block text-sm text-gray-400 hover:text-gray-600"
           onClick={() => setShowSpam(true)}
