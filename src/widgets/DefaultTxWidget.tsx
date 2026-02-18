@@ -32,14 +32,16 @@ export default function DefaultTxWidget({ tx }: { tx: TransactionDetail }) {
         Raw Transaction Data
       </button>
       {open && (
-        <div className="overflow-auto border-t border-gray-100 rounded-b-lg bg-gray-50 p-4 text-xs">
-          <JsonView
-            value={tx}
-            collapsed={2}
-            shortenTextAfterLength={512}
-            displayDataTypes={false} displayObjectSize={false}
-            style={isDark ? darkTheme : undefined}
-          />
+        <div className="border-t border-gray-100 px-4 py-3">
+          <div className="overflow-auto rounded bg-gray-50 p-3 text-xs">
+            <JsonView
+              value={tx}
+              collapsed={2}
+              shortenTextAfterLength={512}
+              displayDataTypes={false} displayObjectSize={false}
+              style={isDark ? darkTheme : undefined}
+            />
+          </div>
         </div>
       )}
     </div>
