@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { CircleAlert } from "lucide-react";
 import useSpamTokens, { isSpam } from "../hooks/useSpamTokens";
+import useSpamNfts, { isSpamNft } from "../hooks/useSpamNfts";
 
 const MAX_LEN = 30;
 const TAIL_LEN = 7;
@@ -27,7 +28,8 @@ export default function AccountId({
   linked?: boolean;
 }) {
   const spamSet = useSpamTokens();
-  const spam = isSpam(spamSet, accountId);
+  const spamNfts = useSpamNfts();
+  const spam = isSpam(spamSet, accountId) || isSpamNft(spamNfts, accountId);
   const display = truncate(accountId);
   const title = accountId.length > MAX_LEN ? accountId : undefined;
 

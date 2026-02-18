@@ -13,7 +13,7 @@ import useSpamNfts, { isSpamNft } from "../hooks/useSpamNfts";
 import { TokenAmount } from "./TransferSummary";
 import NearAmount from "./NearAmount";
 import AccountId from "./AccountId";
-import { ChevronDown, ChevronRight, CircleAlert, Coins, Image, Landmark, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Coins, Image, Landmark, Loader2 } from "lucide-react";
 
 const VISIBLE_LIMIT = 3;
 
@@ -274,9 +274,8 @@ export default function AccountOverview({
             renderItem={(nft) => {
               const spam = isSpamNft(spamNfts, nft.contract_id);
               return (
-                <div key={nft.contract_id} className={`flex items-center gap-1 py-0.5${spam ? " opacity-50" : ""}`}>
+                <div key={nft.contract_id} className={`py-0.5${spam ? " opacity-50" : ""}`}>
                   <AccountId accountId={nft.contract_id} />
-                  {spam && <span title="Flagged as spam"><CircleAlert className="size-3 shrink-0 text-red-500" /></span>}
                 </div>
               );
             }}
