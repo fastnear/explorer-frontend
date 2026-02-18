@@ -33,13 +33,12 @@ export default function AccountId({
   const auto = maxLength === "auto";
   const needsTruncate = auto || accountId.length > maxLength;
 
-  const baseCls = "font-mono text-xs";
   const truncateCls = auto
-    ? `${baseCls} inline-block min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap align-bottom`
-    : `${baseCls} inline-block max-w-[${maxLength + 6}ch] overflow-hidden text-ellipsis whitespace-nowrap align-bottom`;
-  const normalCls = `${baseCls} whitespace-nowrap`;
-
+    ? "font-mono text-xs inline-block min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap align-bottom"
+    : "font-mono text-xs inline-block overflow-hidden text-ellipsis whitespace-nowrap align-bottom";
+  const normalCls = "font-mono text-xs whitespace-nowrap";
   const innerCls = needsTruncate ? truncateCls : normalCls;
+  const maxWidthStyle = needsTruncate && !auto ? { maxWidth: `${maxLength + 6}ch` } : undefined;
 
   if (linked) {
     return (
@@ -47,6 +46,7 @@ export default function AccountId({
         <Link
           to={`/account/${accountId}`}
           className={`${innerCls} text-blue-600 hover:underline`}
+          style={maxWidthStyle}
           title={needsTruncate ? accountId : undefined}
         >
           {accountId}
@@ -60,6 +60,7 @@ export default function AccountId({
     <span className={`inline-flex items-center gap-0.5 ${auto ? "min-w-0 max-w-full" : ""}`}>
       <span
         className={innerCls}
+        style={maxWidthStyle}
         title={needsTruncate ? accountId : undefined}
       >
         {accountId}
