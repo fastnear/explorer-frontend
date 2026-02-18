@@ -9,10 +9,11 @@ import useTokenPrices, {
   type TokenPrice,
 } from "../hooks/useTokenPrices";
 import useSpamTokens, { isSpam } from "../hooks/useSpamTokens";
+import useSpamNfts, { isSpamNft } from "../hooks/useSpamNfts";
 import { TokenAmount } from "./TransferSummary";
 import NearAmount from "./NearAmount";
 import AccountId from "./AccountId";
-import { ChevronDown, ChevronRight, Coins, Image, Landmark, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronRight, CircleAlert, Coins, Image, Landmark, Loader2 } from "lucide-react";
 
 const VISIBLE_LIMIT = 3;
 
@@ -165,7 +166,17 @@ export default function AccountOverview({
   const [showZero, setShowZero] = useState(false);
   const { prices } = useTokenPrices();
   const spamSet = useSpamTokens();
+  const spamNfts = useSpamNfts();
   const sortedTokens = useSortedTokens(data, prices, spamSet);
+  const sortedNfts = useMemo(() => {
+    if (!data || !spamNfts) return data?.nfts ?? [];
+    return [...data.nfts].sort((a, b) => {
+      const aSpam = isSpamNft(spamNfts, a.contract_id);
+      const bSpam = isSpamNft(spamNfts, b.contract_id);
+      if (aSpam !== bSpam) return aSpam ? 1 : -1;
+      return 0;
+    });
+  }, [data, spamNfts]);
 
   if (loading) {
     return (
@@ -186,7 +197,7 @@ export default function AccountOverview({
 
   if (!data) return null;
 
-  const { state, tokens, nfts, pools } = data;
+  const { state, tokens, pools } = data;
 
   if (!state) {
     return (
@@ -256,15 +267,19 @@ export default function AccountOverview({
         <CollapsibleSection
           icon={<Image className="size-4" />}
           title="NFT Contracts"
-          count={nfts.length}
+          count={sortedNfts.length}
         >
           <ExpandableList
-            items={nfts}
-            renderItem={(nft) => (
-              <div key={nft.contract_id} className="py-0.5">
-                <AccountId accountId={nft.contract_id} />
-              </div>
-            )}
+            items={sortedNfts}
+            renderItem={(nft) => {
+              const spam = isSpamNft(spamNfts, nft.contract_id);
+              return (
+                <div key={nft.contract_id} className={`flex items-center gap-1 py-0.5${spam ? " opacity-50" : ""}`}>
+                  <AccountId accountId={nft.contract_id} />
+                  {spam && <span title="Flagged as spam"><CircleAlert className="size-3 shrink-0 text-red-500" /></span>}
+                </div>
+              );
+            }}
           />
         </CollapsibleSection>
 
