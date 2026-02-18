@@ -133,7 +133,7 @@ export default function BlockDetail() {
           </div>
           <div>
             <dt className="shrink-0 text-gray-500">Tokens Burnt</dt>
-            <dd><NearAmount yoctoNear={block.tokens_burnt} /></dd>
+            <dd><NearAmount yoctoNear={block.tokens_burnt} showPrice /></dd>
           </div>
           <div>
             <dt className="shrink-0 text-gray-500">Chunks</dt>

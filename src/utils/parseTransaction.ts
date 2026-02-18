@@ -22,6 +22,13 @@ export interface TransferInfo {
   tokenId?: string; // raw token_id within NEP-245 contract (e.g. "nep141:wrap.near" or native "42")
 }
 
+export interface NftTransferInfo {
+  from: string | null;
+  to: string | null;
+  contractId: string;
+  tokenId: string;
+}
+
 export interface ParsedTx {
   hash: string;
   signer_id: string;
@@ -33,6 +40,7 @@ export interface ParsedTx {
   actions: ParsedAction[];
   relayer_id?: string;
   transfers: TransferInfo[];
+  nftTransfers: NftTransferInfo[];
 }
 
 export function parseAction(action: TransactionAction): ParsedAction {
@@ -255,6 +263,53 @@ function extractTransfers(tx: TransactionDetail): TransferInfo[] {
   return transfers;
 }
 
+function extractNftTransfers(tx: TransactionDetail): NftTransferInfo[] {
+  const nftTransfers: NftTransferInfo[] = [];
+
+  for (const r of tx.receipts) {
+    const receiptContractId = r.receipt.receiver_id;
+    for (const log of r.execution_outcome.outcome.logs) {
+      if (!log.startsWith("EVENT_JSON:")) continue;
+      try {
+        const evt = JSON.parse(log.slice(11));
+        if (evt.standard !== "nep171") continue;
+
+        for (const d of evt.data ?? []) {
+          const tokenIds: string[] = d.token_ids ?? [];
+          for (const tid of tokenIds) {
+            if (evt.event === "nft_transfer") {
+              nftTransfers.push({
+                from: d.old_owner_id ?? "",
+                to: d.new_owner_id ?? "",
+                contractId: receiptContractId,
+                tokenId: tid,
+              });
+            } else if (evt.event === "nft_mint") {
+              nftTransfers.push({
+                from: null,
+                to: d.owner_id ?? "",
+                contractId: receiptContractId,
+                tokenId: tid,
+              });
+            } else if (evt.event === "nft_burn") {
+              nftTransfers.push({
+                from: d.owner_id ?? "",
+                to: null,
+                contractId: receiptContractId,
+                tokenId: tid,
+              });
+            }
+          }
+        }
+      } catch {
+        /* skip malformed event JSON */
+      }
+    }
+  }
+
+  return nftTransfers;
+}
+
 function resolveSuccess(tx: TransactionDetail): boolean | null {
   const { status } = tx.execution_outcome.outcome;
   if ("Failure" in status) return false;
@@ -293,6 +348,7 @@ export function parseTransaction(tx: TransactionDetail): ParsedTx {
     is_success,
     actions: actions.map(parseAction),
     transfers: extractTransfers(tx),
+    nftTransfers: extractNftTransfers(tx),
   };
 
   // Detect Delegate: first action is Delegate wrapping the real signer/receiver

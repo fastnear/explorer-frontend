@@ -1,4 +1,5 @@
 import { useState } from "react";
+import useTokenPrices, { getFtPrice, computeUsdValue, formatUsd } from "../hooks/useTokenPrices";
 
 const YOCTO = 24;
 
@@ -16,10 +17,15 @@ function formatNearValue(yoctoNear: string): string {
   return `${whole}.${frac.slice(0, 5)}`;
 }
 
-export default function NearAmount({ yoctoNear }: { yoctoNear?: string }) {
+export default function NearAmount({ yoctoNear, showPrice = false }: { yoctoNear?: string; showPrice?: boolean }) {
   const value = yoctoNear || "0";
   const defaultYocto = value !== "0" && isSmallValue(value);
   const [showYocto, setShowYocto] = useState(defaultYocto);
+  const { prices } = useTokenPrices();
+  const priceInfo = showPrice ? getFtPrice(prices, "wrap.near") : undefined;
+  const usdValue = priceInfo
+    ? computeUsdValue(value, priceInfo.decimals, priceInfo.price)
+    : 0;
 
   return (
     <span
@@ -31,6 +37,9 @@ export default function NearAmount({ yoctoNear }: { yoctoNear?: string }) {
         <>{value} yoctoⓃ</>
       ) : (
         <>{formatNearValue(value)} Ⓝ</>
+      )}
+      {showPrice && !showYocto && usdValue > 0 && (
+        <span className="text-gray-400 font-sans text-xs ml-0.5">{formatUsd(usdValue)}</span>
       )}
     </span>
   );

@@ -6,8 +6,8 @@ import TransactionHash from "./TransactionHash";
 import TimeAgo from "./TimeAgo";
 import AccountId from "./AccountId";
 import Action from "./Action";
-import TransferSummary from "./TransferSummary";
-import type { TransferInfo } from "../utils/parseTransaction";
+import TransferSummary, { NftTransferSummary } from "./TransferSummary";
+import type { TransferInfo, NftTransferInfo } from "../utils/parseTransaction";
 import { CircleCheck, CircleX, Clock, Radio } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -38,24 +38,51 @@ function ActionList({ actions }: { actions: ParsedAction[] }) {
   );
 }
 
-function TransferList({ transfers }: { transfers: TransferInfo[] }) {
+function TransferList({
+  transfers,
+  nftTransfers,
+}: {
+  transfers: TransferInfo[];
+  nftTransfers: NftTransferInfo[];
+}) {
   const [expanded, setExpanded] = useState(false);
-  const showAll = expanded || transfers.length <= TRANSFERS_LIMIT;
-  const visible = showAll ? transfers : transfers.slice(0, TRANSFERS_LIMIT);
+  const totalCount = transfers.length + nftTransfers.length;
+  const showAll = expanded || totalCount <= TRANSFERS_LIMIT;
+
+  if (showAll) {
+    return (
+      <>
+        {transfers.map((t, i) => (
+          <TransferSummary key={`ft-${i}`} transfer={t} />
+        ))}
+        {nftTransfers.map((t, i) => (
+          <NftTransferSummary key={`nft-${i}`} transfer={t} />
+        ))}
+      </>
+    );
+  }
+
+  // Show limited items: FT transfers first, then NFT transfers
+  const items: React.ReactNode[] = [];
+  let remaining = TRANSFERS_LIMIT;
+  for (let i = 0; i < transfers.length && remaining > 0; i++, remaining--) {
+    items.push(<TransferSummary key={`ft-${i}`} transfer={transfers[i]} />);
+  }
+  for (let i = 0; i < nftTransfers.length && remaining > 0; i++, remaining--) {
+    items.push(
+      <NftTransferSummary key={`nft-${i}`} transfer={nftTransfers[i]} />,
+    );
+  }
 
   return (
     <>
-      {visible.map((t, i) => (
-        <TransferSummary key={i} transfer={t} />
-      ))}
-      {!showAll && (
-        <button
-          onClick={() => setExpanded(true)}
-          className="cursor-pointer text-blue-600 hover:text-blue-800 text-left"
-        >
-          + {transfers.length - TRANSFERS_LIMIT} more...
-        </button>
-      )}
+      {items}
+      <button
+        onClick={() => setExpanded(true)}
+        className="cursor-pointer text-blue-600 hover:text-blue-800 text-left"
+      >
+        + {totalCount - TRANSFERS_LIMIT} more...
+      </button>
     </>
   );
 }
@@ -83,7 +110,7 @@ export function TxTableHeader() {
 }
 
 export default function TxRow({ tx, timestamp }: TxTableItem) {
-  const hasTransfers = tx.transfers.length > 0;
+  const hasTransfers = tx.transfers.length > 0 || tx.nftTransfers.length > 0;
   return (
     <tbody className="group">
       <tr className={`border-b border-gray-100 group-hover:bg-gray-50 ${hasTransfers ? "border-b-0" : ""}`}>
@@ -129,7 +156,7 @@ export default function TxRow({ tx, timestamp }: TxTableItem) {
         <tr className="border-b border-gray-100 group-hover:bg-gray-50">
           <td colSpan={7} className="pb-2 pt-0 pl-10 pr-4">
             <div className="flex flex-col gap-0.5 text-xs text-gray-600 dark:text-gray-400">
-              <TransferList transfers={tx.transfers} />
+              <TransferList transfers={tx.transfers} nftTransfers={tx.nftTransfers} />
             </div>
           </td>
         </tr>
@@ -181,9 +208,9 @@ function TxMobileCard({ tx, timestamp }: TxTableItem) {
       <div className="text-xs text-gray-500 mt-0.5">
         <GasAmount gas={tx.gas_burnt} />
       </div>
-      {tx.transfers.length > 0 && (
+      {(tx.transfers.length > 0 || tx.nftTransfers.length > 0) && (
         <div className="flex flex-col gap-0.5 text-xs text-gray-600 dark:text-gray-400 mt-1 pt-1 border-t border-gray-100">
-          <TransferList transfers={tx.transfers} />
+          <TransferList transfers={tx.transfers} nftTransfers={tx.nftTransfers} />
         </div>
       )}
     </div>

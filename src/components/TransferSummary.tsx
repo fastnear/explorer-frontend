@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { TransferInfo } from "../utils/parseTransaction";
+import type { TransferInfo, NftTransferInfo } from "../utils/parseTransaction";
 import useTokenMetadata, { type TokenMetadata } from "../hooks/useTokenMetadata";
 import useMultiTokenMetadata, {
   type MultiTokenMetadata,
@@ -13,7 +13,8 @@ import useTokenPrices, {
 import useSpamTokens, { isSpam } from "../hooks/useSpamTokens";
 import AccountId from "./AccountId";
 import NearAmount from "./NearAmount";
-import { CircleAlert, CircleStop, Coins, Loader2 } from "lucide-react";
+import { CircleAlert, CircleStop, Coins, Image, Loader2 } from "lucide-react";
+import useSpamNfts, { isSpamNft } from "../hooks/useSpamNfts";
 
 function formatTokenAmount(amount: string, decimals: number): string {
   if (amount === "0") return "0";
@@ -247,11 +248,11 @@ export default function TransferSummary({
       ? <Coins className="size-3" />
       : transfer.tokenType === "nep141"
         ? <CircleStop className="size-3" />
-        : null;
+        : <span className="text-xs leading-none">Ⓝ</span>;
 
   return (
     <span className="inline-flex flex-wrap items-center gap-1">
-      {transfer.from !== null && transfer.to !== null && tokenIcon && (
+      {transfer.from !== null && transfer.to !== null && (
         <span className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-gray-400">
           {tokenIcon}
         </span>
@@ -262,7 +263,7 @@ export default function TransferSummary({
       <span className="text-gray-400">&rarr;</span>
       {transfer.to !== null && <AccountId accountId={transfer.to} />}
       {transfer.tokenType === "near" ? (
-        <NearAmount yoctoNear={transfer.amount} />
+        <NearAmount yoctoNear={transfer.amount} showPrice />
       ) : loading ? (
         <Loader2 className="size-3 animate-spin text-gray-400" />
       ) : usesMtLookup && mtMeta ? (
@@ -287,6 +288,54 @@ export default function TransferSummary({
             transfer.tokenType === "nep245" ? transfer.tokenId : undefined
           }
         />
+      )}
+    </span>
+  );
+}
+
+const MAX_TOKEN_ID_LEN = 20;
+
+function truncateTokenId(tokenId: string): string {
+  return tokenId.length > MAX_TOKEN_ID_LEN
+    ? tokenId.slice(0, MAX_TOKEN_ID_LEN - 3) + "\u2026"
+    : tokenId;
+}
+
+export function NftTransferSummary({
+  transfer,
+}: {
+  transfer: NftTransferInfo;
+}) {
+  const spamData = useSpamNfts();
+  const spam = isSpamNft(spamData, transfer.contractId, transfer.tokenId);
+  const isMint = transfer.from === null;
+  const isBurn = transfer.to === null;
+  const nftLabel = (
+    <>
+      <Image className="size-3" />
+      <span>NFT</span>
+    </>
+  );
+
+  return (
+    <span className="inline-flex flex-wrap items-center gap-1">
+      {!isMint && !isBurn && (
+        <span className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-gray-400">
+          {nftLabel}
+        </span>
+      )}
+      {isMint && <MintBadge tokenIcon={nftLabel} />}
+      {isBurn && <BurnBadge tokenIcon={nftLabel} />}
+      {transfer.from !== null && <AccountId accountId={transfer.from} />}
+      <span className="text-gray-400">&rarr;</span>
+      {transfer.to !== null && <AccountId accountId={transfer.to} />}
+      <span className="font-mono whitespace-nowrap text-gray-500" title={transfer.tokenId}>
+        #{truncateTokenId(transfer.tokenId)}
+      </span>
+      {spam && (
+        <span title="Flagged as spam">
+          <CircleAlert className="inline-block size-3 shrink-0 text-red-500" />
+        </span>
       )}
     </span>
   );
