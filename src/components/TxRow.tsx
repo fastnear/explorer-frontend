@@ -194,7 +194,7 @@ function TxMobileCard({ tx, timestamp }: TxTableItem) {
   const closePopup = useCallback(() => setPopupActionIndex(null), []);
 
   return (
-    <div className="px-3 py-2.5">
+    <div className="overflow-hidden px-3 py-2.5">
       <div className="flex items-center justify-between gap-2 mb-1">
         <div className="flex items-center gap-1.5 min-w-0">
           {tx.is_success === null ? (
@@ -215,20 +215,20 @@ function TxMobileCard({ tx, timestamp }: TxTableItem) {
       <div className="mb-1 text-sm">
         <TransactionHash hash={tx.hash} />
       </div>
-      <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-sm">
-        <span className="inline-flex items-center gap-1">
+      <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-sm min-w-0">
+        <span className="inline-flex items-center gap-1 min-w-0 max-w-full">
           {tx.relayer_id && (
             <Link
               to={`/account/${tx.relayer_id}`}
               title={`Relayed by ${tx.relayer_id}`}
             >
-              <Radio className="size-3 text-red-500" />
+              <Radio className="size-3 text-red-500 shrink-0" />
             </Link>
           )}
           <AccountId accountId={tx.signer_id} maxLength="auto" />
         </span>
-        <span className="inline-flex items-center gap-1 min-w-0">
-          <span className="text-gray-400">→</span>
+        <span className="inline-flex items-center gap-1 min-w-0 max-w-full">
+          <span className="text-gray-400 shrink-0">→</span>
           <AccountId accountId={tx.receiver_id} maxLength="auto" />
         </span>
       </div>

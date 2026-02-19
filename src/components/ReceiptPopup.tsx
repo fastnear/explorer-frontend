@@ -58,7 +58,13 @@ export default function ReceiptPopup({
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
+    // Lock body scroll while popup is open
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      document.body.style.overflow = prev;
+    };
   }, [onClose]);
 
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -69,12 +75,12 @@ export default function ReceiptPopup({
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-[10vh]"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain bg-black/40 p-2 pt-4 pb-8 sm:p-4 sm:pt-[10vh] sm:pb-12"
     >
       <div className="relative w-full max-w-3xl">
         <button
           onClick={onClose}
-          className="absolute -top-2 -right-2 z-10 flex size-7 cursor-pointer items-center justify-center rounded-full bg-white shadow-md hover:bg-gray-100"
+          className="absolute top-2 right-2 z-10 flex size-7 cursor-pointer items-center justify-center rounded-full bg-white/90 shadow-md hover:bg-gray-100"
         >
           <X className="size-4 text-gray-600" />
         </button>
