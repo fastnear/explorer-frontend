@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useParams, useLocation, Link } from "react-router-dom";
 import { getTransactions } from "../api/endpoints";
 import type { TransactionDetail } from "../api/types";
 import { getMatchingWidgets } from "../widgets/registry";
@@ -16,11 +16,14 @@ import { CircleCheck, CircleX, Clock, Radio } from "lucide-react";
 
 export default function TxDetail() {
   const { txHash } = useParams<{ txHash: string }>();
+  const { hash } = useLocation();
   const [tx, setTx] = useState<TransactionDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const scrolledRef = useRef(false);
 
   useEffect(() => {
     if (!txHash) return;
+    scrolledRef.current = false;
     getTransactions([txHash])
       .then((data) => {
         if (data.transactions.length > 0) {
@@ -31,6 +34,16 @@ export default function TxDetail() {
       })
       .catch((err) => setError(String(err)));
   }, [txHash]);
+
+  // Scroll to anchor after tx loads (elements don't exist during initial load)
+  useEffect(() => {
+    if (!tx || !hash || scrolledRef.current) return;
+    scrolledRef.current = true;
+    requestAnimationFrame(() => {
+      const el = document.getElementById(hash.slice(1));
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [tx, hash]);
 
   if (error) return <p className="text-red-600">{error}</p>;
   if (!tx) return <p className="text-gray-500">Loading transaction...</p>;

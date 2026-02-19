@@ -73,19 +73,25 @@ export function EventLog({ log }: { log: string }) {
 
 export function ReceiptResult({
   status,
+  txHash,
 }: {
   status: Record<string, unknown>;
+  txHash?: string;
 }) {
   const isDark = useIsDark();
   if ("SuccessReceiptId" in status) {
+    const receiptId = String(status.SuccessReceiptId);
+    const href = txHash
+      ? `/tx/${txHash}#receipt-${receiptId}`
+      : `#receipt-${receiptId}`;
     return (
       <div className="overflow-auto rounded border border-gray-200 bg-gray-50 p-2 text-xs font-mono break-all">
         Receipt:{" "}
         <a
-          href={`#receipt-${String(status.SuccessReceiptId)}`}
+          href={href}
           className="text-blue-600 hover:underline"
         >
-          {String(status.SuccessReceiptId)}
+          {receiptId}
         </a>
       </div>
     );
@@ -109,7 +115,7 @@ export function ReceiptResult({
   return null;
 }
 
-export default function ReceiptCard({ r }: { r: ReceiptWithOutcome }) {
+export default function ReceiptCard({ r, txHash }: { r: ReceiptWithOutcome; txHash?: string }) {
   const outcome = r.execution_outcome.outcome;
   const statusKey = Object.keys(outcome.status)[0];
   const isSuccess =
@@ -195,7 +201,7 @@ export default function ReceiptCard({ r }: { r: ReceiptWithOutcome }) {
 
       <div className="border-t border-gray-100 px-4 py-2">
         <p className="mb-1 text-xs font-medium text-gray-500">Result</p>
-        <ReceiptResult status={outcome.status} />
+        <ReceiptResult status={outcome.status} txHash={txHash} />
       </div>
 
       {outcome.logs.length > 0 && (

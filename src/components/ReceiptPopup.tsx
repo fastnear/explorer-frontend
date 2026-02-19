@@ -36,11 +36,13 @@ function findReceiptForAction(
 }
 
 export default function ReceiptPopup({
+  txHash,
   receipts,
   action,
   actionIndex,
   onClose,
 }: {
+  txHash: string;
   receipts: ReceiptWithOutcome[];
   action: ParsedAction;
   actionIndex: number;
@@ -85,7 +87,7 @@ export default function ReceiptPopup({
           <X className="size-4 text-gray-600" />
         </button>
         {receipt ? (
-          <ReceiptCard r={receipt} />
+          <ReceiptCard r={receipt} txHash={txHash} />
         ) : (
           <div className="rounded-lg border border-gray-200 bg-surface p-6 text-center text-sm text-gray-500">
             No matching receipt found
