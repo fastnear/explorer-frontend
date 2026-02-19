@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import type { ParsedTx } from "../utils/parseTransaction";
 import type { ParsedAction } from "../utils/parseTransaction";
 import GasAmount from "./GasAmount";
@@ -6,6 +6,7 @@ import TransactionHash from "./TransactionHash";
 import TimeAgo from "./TimeAgo";
 import AccountId from "./AccountId";
 import Action from "./Action";
+import ReceiptPopup from "./ReceiptPopup";
 import TransferSummary, { NftTransferSummary } from "./TransferSummary";
 import type { TransferInfo, NftTransferInfo } from "../utils/parseTransaction";
 import { CircleCheck, CircleX, Clock, SlidersHorizontal, Radio } from "lucide-react";
@@ -16,7 +17,13 @@ import useSpamNfts, { isSpamNft } from "../hooks/useSpamNfts";
 const ACTIONS_LIMIT = 3;
 const TRANSFERS_LIMIT = 3;
 
-function ActionList({ actions }: { actions: ParsedAction[] }) {
+function ActionList({
+  actions,
+  onActionClick,
+}: {
+  actions: ParsedAction[];
+  onActionClick?: (index: number) => void;
+}) {
   const [expanded, setExpanded] = useState(false);
   const showAll = expanded || actions.length <= ACTIONS_LIMIT;
   const visible = showAll ? actions : actions.slice(0, ACTIONS_LIMIT);
@@ -24,7 +31,11 @@ function ActionList({ actions }: { actions: ParsedAction[] }) {
   return (
     <>
       {visible.map((a, i) => (
-        <div key={i}>
+        <div
+          key={i}
+          onClick={onActionClick ? (e) => { e.stopPropagation(); onActionClick(i); } : undefined}
+          className={onActionClick ? "cursor-pointer hover:text-blue-600" : undefined}
+        >
           <Action action={a} />
         </div>
       ))}
@@ -113,6 +124,9 @@ export function TxTableHeader() {
 
 export default function TxRow({ tx, timestamp }: TxTableItem) {
   const hasTransfers = tx.transfers.length > 0 || tx.nftTransfers.length > 0;
+  const [popupActionIndex, setPopupActionIndex] = useState<number | null>(null);
+  const closePopup = useCallback(() => setPopupActionIndex(null), []);
+
   return (
     <tbody className="group">
       <tr className={`border-b border-gray-100 group-hover:bg-gray-50 ${hasTransfers ? "border-b-0" : ""}`}>
@@ -139,7 +153,7 @@ export default function TxRow({ tx, timestamp }: TxTableItem) {
           <AccountId accountId={tx.receiver_id} maxLength={20} />
         </td>
         <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">
-          <ActionList actions={tx.actions} />
+          <ActionList actions={tx.actions} onActionClick={setPopupActionIndex} />
         </td>
         <td className="whitespace-nowrap px-4 py-3 text-xs">
           <GasAmount gas={tx.gas_burnt} />
@@ -163,11 +177,22 @@ export default function TxRow({ tx, timestamp }: TxTableItem) {
           </td>
         </tr>
       )}
+      {popupActionIndex !== null && (
+        <ReceiptPopup
+          txHash={tx.hash}
+          action={tx.actions[popupActionIndex]}
+          actionIndex={popupActionIndex}
+          onClose={closePopup}
+        />
+      )}
     </tbody>
   );
 }
 
 function TxMobileCard({ tx, timestamp }: TxTableItem) {
+  const [popupActionIndex, setPopupActionIndex] = useState<number | null>(null);
+  const closePopup = useCallback(() => setPopupActionIndex(null), []);
+
   return (
     <div className="px-3 py-2.5">
       <div className="flex items-center justify-between gap-2 mb-1">
@@ -180,7 +205,7 @@ function TxMobileCard({ tx, timestamp }: TxTableItem) {
             <CircleX className="size-3.5 text-red-600 shrink-0" />
           )}
           <span className="font-mono text-xs truncate">
-            <ActionList actions={tx.actions} />
+            <ActionList actions={tx.actions} onActionClick={setPopupActionIndex} />
           </span>
         </div>
         <span className="text-xs text-gray-500 shrink-0">
@@ -214,6 +239,14 @@ function TxMobileCard({ tx, timestamp }: TxTableItem) {
         <div className="flex flex-col gap-0.5 text-xs text-gray-600 dark:text-gray-400 mt-1 pt-1 border-t border-gray-100">
           <TransferList transfers={tx.transfers} nftTransfers={tx.nftTransfers} />
         </div>
+      )}
+      {popupActionIndex !== null && (
+        <ReceiptPopup
+          txHash={tx.hash}
+          action={tx.actions[popupActionIndex]}
+          actionIndex={popupActionIndex}
+          onClose={closePopup}
+        />
       )}
     </div>
   );
