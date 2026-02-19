@@ -122,7 +122,7 @@ export default function Base64Data({ base64 }: { base64: string }) {
           {mode === "json" && json ? (
             <JsonView
               value={json}
-              collapsed={2}
+              collapsed={4}
               shortenTextAfterLength={512}
               displayDataTypes={false} displayObjectSize={false}
               style={isDark ? darkTheme : undefined}

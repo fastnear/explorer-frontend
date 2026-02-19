@@ -52,7 +52,7 @@ export function EventLog({ log }: { log: string }) {
           <div className="mt-1 overflow-auto text-xs">
             <JsonView
               value={json.data}
-              collapsed={2}
+              collapsed={4}
               displayDataTypes={false}
               displayObjectSize={false}
               shortenTextAfterLength={512}
