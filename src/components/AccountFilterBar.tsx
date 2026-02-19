@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { AccountFilters } from "../api/types";
+import type { SpamFilterProps } from "./TxRow";
 import { SlidersHorizontal, X } from "lucide-react";
 
 type TriState = boolean | undefined;
@@ -83,10 +84,12 @@ export default function AccountFilterBar({
   filters,
   onChange,
   hasActiveFilters,
+  spam,
 }: {
   filters: AccountFilters;
   onChange: (filters: AccountFilters) => void;
   hasActiveFilters: boolean;
+  spam: SpamFilterProps;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -155,12 +158,19 @@ export default function AccountFilterBar({
             </button>
           )}
         </div>
-        <button
-          onClick={toggleOrder}
-          className="inline-flex cursor-pointer items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-        >
-          {filters.desc === false ? "Oldest first" : "Newest first"}
-        </button>
+        <div className="flex items-center gap-3">
+          {!spam.showSpam && spam.spamCount > 0 && (
+            <span className="text-xs text-gray-400">
+              Hiding {spam.spamCount} spam
+            </span>
+          )}
+          <button
+            onClick={toggleOrder}
+            className="inline-flex cursor-pointer items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          >
+            {filters.desc === false ? "Oldest first" : "Newest first"}
+          </button>
+        </div>
       </div>
       {open && (
         <div className="border-t border-gray-100 bg-gray-50 px-4 py-3 space-y-3">
@@ -208,6 +218,23 @@ export default function AccountFilterBar({
                 className="w-36 rounded border border-gray-200 bg-white px-2 py-1 text-xs focus:border-blue-300 focus:outline-none"
               />
             </div>
+          </div>
+          <div>
+            <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+              Spam
+            </div>
+            <label className="inline-flex cursor-pointer items-center gap-2 text-xs text-gray-600">
+              <input
+                type="checkbox"
+                checked={spam.showSpam}
+                onChange={(e) => spam.setShowSpam(e.target.checked)}
+                className="rounded"
+              />
+              Show spam transactions
+              {spam.spamCount > 0 && (
+                <span className="text-gray-400">({spam.spamCount} hidden)</span>
+              )}
+            </label>
           </div>
         </div>
       )}

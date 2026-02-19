@@ -289,7 +289,19 @@ function SpamFilterBar({
   );
 }
 
-export function FilteredTxTable({ items, filterBar }: { items: TxTableItem[]; filterBar?: React.ReactNode }) {
+export interface SpamFilterProps {
+  showSpam: boolean;
+  setShowSpam: (v: boolean) => void;
+  spamCount: number;
+}
+
+export function FilteredTxTable({
+  items,
+  filterBar,
+}: {
+  items: TxTableItem[];
+  filterBar?: (spam: SpamFilterProps) => React.ReactNode;
+}) {
   const [showSpam, setShowSpam] = useState(false);
   const spamTokens = useSpamTokens();
   const spamNfts = useSpamNfts();
@@ -310,13 +322,15 @@ export function FilteredTxTable({ items, filterBar }: { items: TxTableItem[]; fi
     return { filtered, spamCount };
   }, [items, showSpam, spamTokens, spamNfts]);
 
-  const bar = <SpamFilterBar spamCount={spamCount} showSpam={showSpam} setShowSpam={setShowSpam} />;
+  const spamProps: SpamFilterProps = { showSpam, setShowSpam, spamCount };
+  const topBar = filterBar
+    ? filterBar(spamProps)
+    : <SpamFilterBar {...spamProps} />;
 
   return (
     <>
       <div className="hidden sm:block min-w-fit rounded-lg border border-gray-200 bg-surface">
-        {filterBar}
-        {bar}
+        {topBar}
         <table className="w-full text-sm">
           <TxTableHeader />
           {filtered.map((item, i) => (
@@ -329,8 +343,7 @@ export function FilteredTxTable({ items, filterBar }: { items: TxTableItem[]; fi
         </table>
       </div>
       <div className="sm:hidden rounded-lg border border-gray-200 bg-surface divide-y divide-gray-100">
-        {filterBar}
-        {bar}
+        {topBar}
         {filtered.map((item, i) => (
           <TxMobileCard
             key={`${item.tx.hash}-${i}`}

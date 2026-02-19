@@ -90,13 +90,14 @@ export default function AccountDetail() {
 
       <FilteredTxTable
         items={txItems}
-        filterBar={
+        filterBar={(spam) => (
           <AccountFilterBar
             filters={filters}
             onChange={setFilters}
             hasActiveFilters={hasActiveFilters}
+            spam={spam}
           />
-        }
+        )}
       />
 
       {!loading && txItems.length === 0 && hasActiveFilters && (
