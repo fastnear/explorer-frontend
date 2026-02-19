@@ -179,7 +179,7 @@ export default function TxRow({ tx, timestamp }: TxTableItem) {
       )}
       {popupActionIndex !== null && (
         <ReceiptPopup
-          txHash={tx.hash}
+          receipts={tx.receipts}
           action={tx.actions[popupActionIndex]}
           actionIndex={popupActionIndex}
           onClose={closePopup}
@@ -242,7 +242,7 @@ function TxMobileCard({ tx, timestamp }: TxTableItem) {
       )}
       {popupActionIndex !== null && (
         <ReceiptPopup
-          txHash={tx.hash}
+          receipts={tx.receipts}
           action={tx.actions[popupActionIndex]}
           actionIndex={popupActionIndex}
           onClose={closePopup}

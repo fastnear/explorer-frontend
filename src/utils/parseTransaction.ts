@@ -1,4 +1,4 @@
-import type { TransactionDetail, TransactionAction } from "../api/types";
+import type { TransactionDetail, TransactionAction, ReceiptWithOutcome } from "../api/types";
 import { encodeBase58 } from "./format";
 
 export interface ParsedAction {
@@ -41,6 +41,7 @@ export interface ParsedTx {
   relayer_id?: string;
   transfers: TransferInfo[];
   nftTransfers: NftTransferInfo[];
+  receipts: ReceiptWithOutcome[];
 }
 
 export function parseAction(action: TransactionAction): ParsedAction {
@@ -349,6 +350,7 @@ export function parseTransaction(tx: TransactionDetail): ParsedTx {
     actions: actions.map(parseAction),
     transfers: extractTransfers(tx),
     nftTransfers: extractNftTransfers(tx),
+    receipts: tx.receipts,
   };
 
   // Detect Delegate: first action is Delegate wrapping the real signer/receiver
