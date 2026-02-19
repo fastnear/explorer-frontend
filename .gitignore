@@ -3,3 +3,5 @@ dist
 .env
 .env.local
 yarn.lock
+.DS_Store
+bun.lock
