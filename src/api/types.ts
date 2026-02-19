@@ -136,6 +136,12 @@ export interface AccountResponse {
   txs_count: number;
 }
 
+export interface BlockFilters {
+  from_block_height?: number;
+  to_block_height?: number;
+  desc?: boolean;
+}
+
 export interface AccountFilters {
   is_signer?: boolean;
   is_delegated_signer?: boolean;
