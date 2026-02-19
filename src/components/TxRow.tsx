@@ -8,7 +8,7 @@ import AccountId from "./AccountId";
 import Action from "./Action";
 import TransferSummary, { NftTransferSummary } from "./TransferSummary";
 import type { TransferInfo, NftTransferInfo } from "../utils/parseTransaction";
-import { CircleCheck, CircleX, Clock, Filter, Radio } from "lucide-react";
+import { CircleCheck, CircleX, Clock, SlidersHorizontal, Radio } from "lucide-react";
 import { Link } from "react-router-dom";
 import useSpamTokens, { isSpam } from "../hooks/useSpamTokens";
 import useSpamNfts, { isSpamNft } from "../hooks/useSpamNfts";
@@ -256,25 +256,30 @@ function SpamFilterBar({
   showSpam: boolean;
   setShowSpam: (v: boolean) => void;
 }) {
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="border-b border-gray-200">
-      <div className="flex items-center justify-between gap-2 px-4 py-2 text-sm">
-        <span className="text-gray-400 text-xs">
-          {spamCount > 0 ? `Hiding ${spamCount} spam transaction${spamCount === 1 ? "" : "s"}` : "Hiding spam transactions"}
-        </span>
+      <div className="flex items-center justify-between gap-2 px-4 py-2">
         <button
-          onClick={() => setFiltersOpen((o) => !o)}
-          className="inline-flex cursor-pointer items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          onClick={() => setOpen((o) => !o)}
+          className="inline-flex cursor-pointer items-center gap-1.5 rounded px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
         >
-          <Filter className="size-3.5" />
-          Filter
+          <SlidersHorizontal className="size-3.5" />
+          Filters
         </button>
+        {!showSpam && spamCount > 0 && (
+          <span className="text-xs text-gray-400">
+            Hiding {spamCount} spam
+          </span>
+        )}
       </div>
-      {filtersOpen && (
-        <div className="border-t border-gray-100 bg-gray-50 px-4 py-2 text-sm">
-          <label className="inline-flex cursor-pointer items-center gap-2">
+      {open && (
+        <div className="border-t border-gray-100 bg-gray-50 px-4 py-3">
+          <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+            Spam
+          </div>
+          <label className="inline-flex cursor-pointer items-center gap-2 text-xs text-gray-600">
             <input
               type="checkbox"
               checked={showSpam}
@@ -282,6 +287,9 @@ function SpamFilterBar({
               className="rounded"
             />
             Show spam transactions
+            {spamCount > 0 && (
+              <span className="text-gray-400">({spamCount} hidden)</span>
+            )}
           </label>
         </div>
       )}
