@@ -4,6 +4,7 @@ import type {
   BlockDetailResponse,
   TransactionsResponse,
   AccountResponse,
+  AccountFilters,
 } from "./types";
 
 export function getBlocks(
@@ -29,7 +30,7 @@ export function getTransactions(
 
 export function getAccount(
   accountId: string,
-  filters: { resume_token?: string; limit?: number } = {}
+  filters: { resume_token?: string; limit?: number } & AccountFilters = {}
 ): Promise<AccountResponse> {
   return fetchApi<AccountResponse>("account", {
     account_id: accountId,

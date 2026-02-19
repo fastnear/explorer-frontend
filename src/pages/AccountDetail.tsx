@@ -5,21 +5,25 @@ import type { AccountTx } from "../api/types";
 import useTxDetails from "../hooks/useTxDetails";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import useAccountOverview from "../hooks/useAccountOverview";
+import useAccountFilters from "../hooks/useAccountFilters";
 import { FilteredTxTable } from "../components/TxRow";
 import type { TxTableItem } from "../components/TxRow";
 import InfiniteScrollSentinel from "../components/InfiniteScrollSentinel";
 import AccountOverview from "../components/AccountOverview";
+import AccountFilterBar from "../components/AccountFilterBar";
 
 const BATCH_SIZE = 80;
 
 export default function AccountDetail() {
   const { accountId } = useParams<{ accountId: string }>();
+  const { filters, setFilters, filterKey, hasActiveFilters } = useAccountFilters();
 
   const fetchPage = useCallback(
     async (resumeToken?: string, limit?: number) => {
       const data = await getAccount(accountId!, {
         resume_token: resumeToken,
         limit: limit ?? BATCH_SIZE,
+        ...filters,
       });
       return {
         items: data.account_txs,
@@ -27,7 +31,7 @@ export default function AccountDetail() {
         totalCount: data.txs_count,
       };
     },
-    [accountId]
+    [accountId, filters]
   );
 
   const {
@@ -42,7 +46,7 @@ export default function AccountDetail() {
   } = useInfiniteScroll<AccountTx>({
     fetchPage,
     batchSize: BATCH_SIZE,
-    key: accountId ?? "",
+    key: `${accountId ?? ""}:${filterKey}`,
   });
 
   // All accumulated hashes + prefetched ahead buffer for preloading
@@ -84,7 +88,22 @@ export default function AccountDetail() {
         </p>
       )}
 
-      <FilteredTxTable items={txItems} />
+      <FilteredTxTable
+        items={txItems}
+        filterBar={
+          <AccountFilterBar
+            filters={filters}
+            onChange={setFilters}
+            hasActiveFilters={hasActiveFilters}
+          />
+        }
+      />
+
+      {!loading && txItems.length === 0 && hasActiveFilters && (
+        <p className="py-8 text-center text-sm text-gray-500">
+          No transactions match the current filters.
+        </p>
+      )}
 
       <InfiniteScrollSentinel
         onLoadMore={loadMore}

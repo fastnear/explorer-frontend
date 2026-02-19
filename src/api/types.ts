@@ -135,3 +135,21 @@ export interface AccountResponse {
   resume_token?: string;
   txs_count: number;
 }
+
+export interface AccountFilters {
+  is_signer?: boolean;
+  is_delegated_signer?: boolean;
+  is_real_signer?: boolean;
+  is_any_signer?: boolean;
+  is_predecessor?: boolean;
+  is_explicit_refund_to?: boolean;
+  is_receiver?: boolean;
+  is_real_receiver?: boolean;
+  is_function_call?: boolean;
+  is_action_arg?: boolean;
+  is_event_log?: boolean;
+  is_success?: boolean;
+  from_tx_block_height?: number;
+  to_tx_block_height?: number;
+  desc?: boolean;
+}
