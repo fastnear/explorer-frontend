@@ -4,7 +4,9 @@
 //
 // Redirect rules:
 //   alex.near.rocks              → near.rocks/account/alex.near
+//   <64-hex>.near.rocks          → near.rocks/account/<64-hex>  (implicit account)
 //   alice.testnet.near.rocks     → testnet.near.rocks/account/alice.testnet
+//   <64-hex>.testnet.near.rocks  → testnet.near.rocks/account/<64-hex>  (implicit account)
 //   123512343.testnet.near.rocks → testnet.near.rocks/block/123512343
 //   <base58-txhash>.testnet.near.rocks → testnet.near.rocks/tx/<base58-txhash>
 //   bob.tg.near.rocks            → near.rocks/account/bob.tg
@@ -40,12 +42,17 @@ function decodeBase58(str) {
   return bytes.length;
 }
 
+// 64-hex implicit account (ed25519 public key)
+const HEX64_RE = /^[0-9a-f]{64}$/;
+
 function detectType(subdomain) {
-  // Block number: all digits (with optional commas stripped)
+  // Block number: all digits
   if (/^\d+$/.test(subdomain)) return "block";
+  // Implicit account: 64 hex chars (must check before tx, since some hex is valid base58)
+  if (HEX64_RE.test(subdomain)) return "implicit";
   // TX hash: base58-encoded 32 bytes, typically 43-44 chars
   if (subdomain.length < 50 && decodeBase58(subdomain) === 32) return "tx";
-  // Everything else is an account name
+  // Everything else is a named account
   return "account";
 }
 
@@ -54,7 +61,7 @@ export default {
     const url = new URL(request.url);
     const host = url.hostname.toLowerCase();
 
-    // *.testnet.near.rocks → block, tx, or {sub}.testnet account
+    // *.testnet.near.rocks → block, tx, implicit, or {sub}.testnet account
     if (host.endsWith(".testnet.near.rocks")) {
       const sub = host.slice(0, -".testnet.near.rocks".length);
       if (sub) {
@@ -64,6 +71,9 @@ export default {
         }
         if (type === "tx") {
           return Response.redirect(`${TESTNET_BASE}/tx/${sub}`, 302);
+        }
+        if (type === "implicit") {
+          return Response.redirect(`${TESTNET_BASE}/account/${sub}`, 302);
         }
         return Response.redirect(`${TESTNET_BASE}/account/${sub}.testnet`, 302);
       }
@@ -77,7 +87,7 @@ export default {
       }
     }
 
-    // *.near.rocks → block, tx, or {sub}.near account
+    // *.near.rocks → block, tx, implicit, or {sub}.near account
     if (host.endsWith(".near.rocks")) {
       const sub = host.slice(0, -".near.rocks".length);
       if (sub) {
@@ -87,6 +97,9 @@ export default {
         }
         if (type === "tx") {
           return Response.redirect(`${MAINNET_BASE}/tx/${sub}`, 302);
+        }
+        if (type === "implicit") {
+          return Response.redirect(`${MAINNET_BASE}/account/${sub}`, 302);
         }
         return Response.redirect(`${MAINNET_BASE}/account/${sub}.near`, 302);
       }
