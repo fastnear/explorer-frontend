@@ -5,6 +5,7 @@ import type { AccountTx } from "../api/types";
 import useTxDetails from "../hooks/useTxDetails";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import useAccountOverview from "../hooks/useAccountOverview";
+import useAccountState from "../hooks/useAccountState";
 import useAccountFilters from "../hooks/useAccountFilters";
 import { FilteredTxTable } from "../components/TxRow";
 import type { TxTableItem } from "../components/TxRow";
@@ -60,6 +61,7 @@ export default function AccountDetail() {
 
   const { txMap } = useTxDetails(hashes, accountId);
   const { data: overview, loading: overviewLoading, error: overviewError } = useAccountOverview(accountId);
+  const { data: accountState, loading: stateLoading } = useAccountState(accountId);
 
   const txItems: TxTableItem[] = useMemo(
     () =>
@@ -80,7 +82,7 @@ export default function AccountDetail() {
         Account: <span className="font-mono text-base">{accountId}</span>
       </h1>
 
-      <AccountOverview data={overview} loading={overviewLoading} error={overviewError} />
+      <AccountOverview data={overview} loading={overviewLoading} error={overviewError} accountState={accountState} stateLoading={stateLoading} />
 
       {totalCount > 0 && (
         <p className="mb-3 text-sm text-gray-600">

@@ -11,10 +11,11 @@ import useTokenPrices, {
 } from "../hooks/useTokenPrices";
 import useSpamTokens, { isSpam } from "../hooks/useSpamTokens";
 import useSpamNfts, { isSpamNft } from "../hooks/useSpamNfts";
+import type { AccountState } from "../api/rpc";
 import { TokenAmount } from "./TransferSummary";
 import NearAmount from "./NearAmount";
 import AccountId from "./AccountId";
-import { ChevronDown, ChevronRight, Coins, Image, Landmark, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Code, Coins, Image, Landmark, Loader2 } from "lucide-react";
 
 const VISIBLE_LIMIT = 3;
 
@@ -275,10 +276,14 @@ export default function AccountOverview({
   data,
   loading,
   error,
+  accountState,
+  stateLoading,
 }: {
   data: AccountFullResponse | null;
   loading: boolean;
   error: string | null;
+  accountState?: AccountState | null;
+  stateLoading?: boolean;
 }) {
   const { prices } = useTokenPrices();
   const spamSet = useSpamTokens();
@@ -327,7 +332,8 @@ export default function AccountOverview({
 
   const { state, tokens, pools } = data;
 
-  if (!state) {
+  // RPC is not loaded yet and fastnear says account doesn't exist
+  if (!accountState && !stateLoading && !state) {
     return (
       <p className="mb-6 text-sm text-gray-500">
         This account does not exist on-chain.
@@ -335,26 +341,68 @@ export default function AccountOverview({
     );
   }
 
+  // RPC loaded but account not found
+  if (accountState === null && !stateLoading && !state) {
+    return (
+      <p className="mb-6 text-sm text-gray-500">
+        This account does not exist on-chain.
+      </p>
+    );
+  }
+
+  // Prefer RPC data; fall back to fastnear API data
+  const balance = accountState?.amount ?? state?.balance;
+  const locked = accountState?.locked ?? state?.locked;
+  const storageBytes = accountState?.storage_usage ?? state?.storage_bytes;
+
   const zeroTokens = tokens.filter((t) => !isNonZeroBalance(t));
 
   return (
     <div className="mb-6 space-y-3 rounded-lg border border-gray-200 bg-surface px-4 py-4 text-sm">
       {/* State summary */}
       <dl className="grid gap-px sm:grid-cols-2 [&>div]:flex [&>div]:min-w-0 [&>div]:gap-2 [&>div]:py-1">
-        <div>
-          <dt className="shrink-0 text-gray-500">Balance</dt>
-          <dd><NearAmount yoctoNear={state.balance} showPrice /></dd>
-        </div>
-        {state.locked !== "0" && (
+        {balance && (
           <div>
-            <dt className="shrink-0 text-gray-500">Locked (Staked)</dt>
-            <dd><NearAmount yoctoNear={state.locked} showPrice /></dd>
+            <dt className="shrink-0 text-gray-500">Balance</dt>
+            <dd><NearAmount yoctoNear={balance} showPrice /></dd>
           </div>
         )}
-        <div>
-          <dt className="shrink-0 text-gray-500">Storage Used</dt>
-          <dd>{formatStorageBytes(state.storage_bytes)}</dd>
-        </div>
+        {locked && locked !== "0" && (
+          <div>
+            <dt className="shrink-0 text-gray-500">Locked (Staked)</dt>
+            <dd><NearAmount yoctoNear={locked} showPrice /></dd>
+          </div>
+        )}
+        {storageBytes != null && (
+          <div>
+            <dt className="shrink-0 text-gray-500">Storage Used</dt>
+            <dd>{formatStorageBytes(storageBytes)}</dd>
+          </div>
+        )}
+        {stateLoading && !accountState && (
+          <div>
+            <dt className="shrink-0 text-gray-500">Contract</dt>
+            <dd><Loader2 className="size-3 animate-spin text-gray-400" /></dd>
+          </div>
+        )}
+        {accountState && (
+          <div>
+            <dt className="shrink-0 text-gray-500">Contract</dt>
+            <dd className="flex items-center gap-1.5">
+              {accountState.hasContract ? (
+                <>
+                  <Code className="size-3.5 text-green-600" />
+                  <span className="text-green-700">Deployed</span>
+                  <span className="font-mono text-xs text-gray-400" title={accountState.code_hash}>
+                    {accountState.code_hash.slice(0, 8)}&hellip;
+                  </span>
+                </>
+              ) : (
+                <span className="text-gray-400">None</span>
+              )}
+            </dd>
+          </div>
+        )}
       </dl>
 
       <div className="sm:columns-2 sm:gap-0">
