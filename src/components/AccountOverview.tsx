@@ -11,11 +11,11 @@ import useTokenPrices, {
 } from "../hooks/useTokenPrices";
 import useSpamTokens, { isSpam } from "../hooks/useSpamTokens";
 import useSpamNfts, { isSpamNft } from "../hooks/useSpamNfts";
-import type { AccountState } from "../api/rpc";
+import type { AccountState, AccessKeySummary } from "../api/rpc";
 import { TokenAmount } from "./TransferSummary";
 import NearAmount from "./NearAmount";
 import AccountId from "./AccountId";
-import { ChevronDown, ChevronRight, Code, Coins, Image, Landmark, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Code, Coins, Image, Key, Landmark, Loader2, Lock, ShieldCheck } from "lucide-react";
 
 const VISIBLE_LIMIT = 3;
 
@@ -278,12 +278,16 @@ export default function AccountOverview({
   error,
   accountState,
   stateLoading,
+  accessKeys,
+  accessKeysLoading,
 }: {
   data: AccountFullResponse | null;
   loading: boolean;
   error: string | null;
   accountState?: AccountState | null;
   stateLoading?: boolean;
+  accessKeys?: AccessKeySummary | null;
+  accessKeysLoading?: boolean;
 }) {
   const { prices } = useTokenPrices();
   const spamSet = useSpamTokens();
@@ -399,6 +403,40 @@ export default function AccountOverview({
                 </>
               ) : (
                 <span className="text-gray-400">None</span>
+              )}
+            </dd>
+          </div>
+        )}
+        {accessKeysLoading && !accessKeys && (
+          <div>
+            <dt className="shrink-0 text-gray-500">Access Keys</dt>
+            <dd><Loader2 className="size-3 animate-spin text-gray-400" /></dd>
+          </div>
+        )}
+        {accessKeys && (
+          <div>
+            <dt className="shrink-0 text-gray-500">Access Keys</dt>
+            <dd className="flex items-center gap-1.5">
+              <Key className="size-3.5 shrink-0 text-gray-400" />
+              <span>{accessKeys.total}</span>
+              {accessKeys.total === 0 ? (
+                <span
+                  title="This account has no access keys — it is locked and cannot be controlled by any key"
+                  className="inline-flex items-center gap-0.5 rounded bg-gray-100 px-1 py-0.5 text-[10px] font-medium text-gray-500"
+                >
+                  <Lock className="size-3" />
+                  Locked
+                </span>
+              ) : (
+                accessKeys.types.every((t) => t.isPostQuantum) && (
+                  <span
+                    title="Every access key uses post-quantum cryptography (ML-DSA) — this account is quantum-safe"
+                    className="inline-flex items-center gap-0.5 rounded bg-purple-100 px-1 py-0.5 text-[10px] font-medium text-purple-700 dark:bg-purple-950"
+                  >
+                    <ShieldCheck className="size-3" />
+                    Quantum-safe
+                  </span>
+                )
               )}
             </dd>
           </div>
