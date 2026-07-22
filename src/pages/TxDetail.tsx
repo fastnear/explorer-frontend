@@ -8,6 +8,7 @@ import GasAmount from "../components/GasAmount";
 import NearAmount from "../components/NearAmount";
 import TransactionHash from "../components/TransactionHash";
 import AccountId from "../components/AccountId";
+import PublicKey from "../components/PublicKey";
 import BlockHeight from "../components/BlockHeight";
 import TimeAgo from "../components/TimeAgo";
 import TransferSummary, { NftTransferSummary } from "../components/TransferSummary";
@@ -98,6 +99,14 @@ export default function TxDetail() {
               <AccountId accountId={parsed.signer_id} />
             </dd>
           </div>
+          {parsed.public_key && (
+            <div>
+              <dt className="shrink-0 text-gray-500">Signer Key</dt>
+              <dd className="flex min-w-0 flex-1 items-center">
+                <PublicKey publicKey={parsed.public_key} />
+              </dd>
+            </div>
+          )}
           <div>
             <dt className="shrink-0 text-gray-500">Receiver</dt>
             <dd>

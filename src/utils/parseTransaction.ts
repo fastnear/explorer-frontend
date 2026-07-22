@@ -33,6 +33,7 @@ export interface ParsedTx {
   hash: string;
   signer_id: string;
   receiver_id: string;
+  public_key?: string; // access key that signed the tx ("{curve}:{base58}")
   block_height: number;
   timestamp: string;
   gas_burnt: number;
@@ -343,6 +344,10 @@ export function parseTransaction(tx: TransactionDetail): ParsedTx {
     hash: tx.transaction.hash,
     signer_id: tx.transaction.signer_id,
     receiver_id: tx.transaction.receiver_id,
+    public_key:
+      typeof tx.transaction.public_key === "string"
+        ? tx.transaction.public_key
+        : undefined,
     block_height: tx.execution_outcome.block_height,
     timestamp: String(tx.execution_outcome.block_timestamp),
     gas_burnt: totalGas,
