@@ -340,4 +340,13 @@ describe("parser", () => {
       );
     expect(parseTransaction(tx).fee).toBe(expected.toString());
   });
+
+  test("signing key is the sender's, not the relayer's, for relayed transactions", () => {
+    const direct = fixture("near-send");
+    expect(parseTransaction(direct).public_key).toBe(direct.transaction.public_key);
+
+    const relayed = parseTransaction(fixture("nft-transfer-relayed"));
+    expect(relayed.signer_id).toBe("vitvit203.tg");
+    expect(relayed.public_key).toBe("ed25519:mCPHBjCUrEZj3Rj3VHb7rL3vkPtLwwoM3TZdyuUeio3");
+  });
 });

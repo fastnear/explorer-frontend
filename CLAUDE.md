@@ -67,7 +67,7 @@ There is no network-wide "latest transactions" endpoint; `useLatestActivity` ass
 - `useTxDetails` — batches hashes into `getTransactions` calls, returns `Map<hash, ParsedTx>`, and refetches transactions that are still pending.
 - `useInfiniteScroll` — cursor pagination with one page prefetched ahead.
 - `useAccountFilters` / `useBlockFilters` — filters stored in the URL query.
-- `useAccountActivity`, `useStakingBalances`, `useAccountOverview`, `useAccountState` — account page data.
+- `useAccountActivity`, `useStakingBalances`, `useAccountOverview`, `useAccountState`, `useAccessKeys` — account page data. `useAccessKeys` loads the key list once per account; the header badges (Locked, Quantum-safe) and the Details tab share it.
 
 ### Widget system (`src/widgets/`)
 
@@ -78,7 +78,7 @@ There is no network-wide "latest transactions" endpoint; `useLatestActivity` ass
 - Feed: `TxFeed` (sentence rows with placeholders and expandable details), `TxSummary` (renders sentence parts), `KindBadge`, `StatusBadge`.
 - Transaction: `BalanceChanges`, `Action` (`ActionLine` plain wording, `ActionExpanded` for receipts), `ReceiptCard`, `ReceiptPopup`, `Base64Data`.
 - Account: `account/AccountHeader`, `TokensTab`, `NftsTab`, `StakingTab`, `DetailsTab`, `AccountFilterBar`.
-- Entities: `AccountId`, `TransactionHash`, `BlockHeight`, `BlockHash`, `NearAmount`, `GasAmount`, `TimeAgo`, `TransferSummary` (`TransferAmount`, `TokenAmount`).
+- Entities: `AccountId`, `TransactionHash`, `PublicKey`, `BlockHeight`, `BlockHash`, `NearAmount`, `GasAmount`, `TimeAgo`, `TransferSummary` (`TransferAmount`, `TokenAmount`).
 - Primitives: `Collapsible`, `Tabs`, `StatTile`, `Skeleton`, `CopyButton`, `SearchBar`, `InfiniteScrollSentinel`, `Layout`.
 
 ### Utilities (`src/utils/`)

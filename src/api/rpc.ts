@@ -1,4 +1,5 @@
 import { networkId } from "../config";
+import { parsePublicKey } from "../utils/publicKey";
 
 const RPC_URL =
   networkId === "testnet"
@@ -53,6 +54,33 @@ export async function viewAccount(
   };
 }
 
+// One cryptography type (curve) present among an account's access keys.
+export interface AccessKeyType {
+  curve: string; // e.g. "ed25519", "secp256k1", "ml-dsa-65-hash"
+  count: number;
+  isPostQuantum: boolean;
+}
+
+export interface AccessKeySummary {
+  total: number;
+  // Access keys grouped by cryptography type, so new curves surface on their
+  // own without special-casing any particular scheme.
+  types: AccessKeyType[];
+}
+
+/** Groups access keys by cryptography type */
+export function summarizeAccessKeys(keys: { public_key: string }[]): AccessKeySummary {
+  const byCurve = new Map<string, AccessKeyType>();
+  for (const k of keys) {
+    const { curve, isPostQuantum } = parsePublicKey(k.public_key);
+    const existing = byCurve.get(curve);
+    if (existing) existing.count += 1;
+    else byCurve.set(curve, { curve, count: 1, isPostQuantum });
+  }
+  const types = [...byCurve.values()].sort((a, b) => b.count - a.count);
+  return { total: keys.length, types };
+}
+
 export async function viewCall<T>(
   contractId: string,
   methodName: string,
@@ -97,10 +125,11 @@ export class TooManyAccessKeysError extends Error {
   }
 }
 
+/** Lists an account's access keys in one RPC call. Returns null for unknown accounts. */
 export async function viewAccessKeys(
   accountId: string,
   signal?: AbortSignal
-): Promise<AccessKeyInfo[]> {
+): Promise<AccessKeyInfo[] | null> {
   const res = await fetch(RPC_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -118,6 +147,7 @@ export async function viewAccessKeys(
   });
   const json = await res.json();
   if (json.error) {
+    if (json.error.cause?.name === "UNKNOWN_ACCOUNT") return null;
     // The RPC refuses to list keys in one response past a fixed limit
     if (json.error.cause?.name === "TOO_MANY_ACCESS_KEYS") {
       throw new TooManyAccessKeysError(json.error.cause.info?.limit ?? 100);

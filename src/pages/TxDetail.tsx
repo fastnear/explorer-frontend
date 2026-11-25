@@ -26,6 +26,7 @@ import StatusBadge from "../components/StatusBadge";
 import TimeAgo from "../components/TimeAgo";
 import TransferSummary, { NftTransferSummary } from "../components/TransferSummary";
 import TxSummary from "../components/TxSummary";
+import PublicKey from "../components/PublicKey";
 
 const PENDING_POLL_MS = 2500;
 const PENDING_MAX_POLLS = 12;
@@ -277,6 +278,11 @@ export default function TxDetail() {
               )}
             </span>
           </Fact>
+          {parsed.public_key && (
+            <Fact label="Signed with">
+              <PublicKey publicKey={parsed.public_key} />
+            </Fact>
+          )}
           <Fact label="To">
             <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <AccountId accountId={parsed.receiver_id} maxLength={64} />

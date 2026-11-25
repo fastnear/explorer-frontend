@@ -1,5 +1,5 @@
-import { Coins, FileCode, History, Landmark, Wallet } from "lucide-react";
-import type { AccountState } from "../../api/rpc";
+import { Coins, FileCode, History, Landmark, Lock, ShieldCheck, Wallet } from "lucide-react";
+import type { AccessKeySummary, AccountState } from "../../api/rpc";
 import type { AccountActivity } from "../../hooks/useAccountActivity";
 import { computeUsdValue, formatUsd, type TokenPrice } from "../../hooks/useTokenPrices";
 import useSpamTokens, { isSpam } from "../../hooks/useSpamTokens";
@@ -36,6 +36,7 @@ export default function AccountHeader({
   loading,
   totals,
   activity,
+  accessKeys,
   prices,
 }: {
   accountId: string;
@@ -45,6 +46,8 @@ export default function AccountHeader({
   loading: boolean;
   totals: AccountTotals;
   activity: AccountActivity | null;
+  /** Access keys grouped by cryptography type; null while unknown */
+  accessKeys?: AccessKeySummary | null;
   prices: Map<string, TokenPrice> | null;
 }) {
   const spamSet = useSpamTokens();
@@ -68,6 +71,22 @@ export default function AccountHeader({
           {state?.hasContract && (
             <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-700">
               <FileCode className="size-3.5" aria-hidden /> Smart contract
+            </span>
+          )}
+          {exists && accessKeys?.total === 0 && (
+            <span
+              title="This account has no access keys — it is locked and cannot be controlled by any key"
+              className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-700"
+            >
+              <Lock className="size-3.5" aria-hidden /> Locked
+            </span>
+          )}
+          {accessKeys && accessKeys.total > 0 && accessKeys.types.every((t) => t.isPostQuantum) && (
+            <span
+              title="Every access key uses post-quantum cryptography (ML-DSA) — this account is quantum-safe"
+              className="inline-flex items-center gap-1 rounded-md bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-800"
+            >
+              <ShieldCheck className="size-3.5" aria-hidden /> Quantum-safe
             </span>
           )}
           {spam && (

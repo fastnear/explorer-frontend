@@ -1,16 +1,11 @@
-import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import {
-  viewAccessKeys,
-  TooManyAccessKeysError,
-  type AccessKeyInfo,
-  type AccountState,
-} from "../../api/rpc";
-import { shortenMiddle } from "../../utils/format";
+import type { AccountState } from "../../api/rpc";
+import type { AccessKeysState } from "../../hooks/useAccessKeys";
 import AccountId from "../AccountId";
 import BlockHeight from "../BlockHeight";
 import CopyButton from "../CopyButton";
 import NearAmount from "../NearAmount";
+import PublicKey from "../PublicKey";
 
 function formatStorageBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -35,31 +30,14 @@ export default function DetailsTab({
   accountId,
   state,
   storageBytes,
+  accessKeys,
 }: {
   accountId: string;
   state: AccountState | null;
   storageBytes?: number;
+  accessKeys: AccessKeysState;
 }) {
-  const [keys, setKeys] = useState<AccessKeyInfo[] | null>(null);
-  const [keysError, setKeysError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    setKeys(null);
-    setKeysError(null);
-    viewAccessKeys(accountId, controller.signal)
-      .then(setKeys)
-      .catch((err) => {
-        if (controller.signal.aborted) return;
-        setKeysError(
-          err instanceof TooManyAccessKeysError
-            ? `This account has more than ${err.limit} access keys, too many to list here.`
-            : "Could not load access keys."
-        );
-      });
-    return () => controller.abort();
-  }, [accountId]);
-
+  const { keys, summary, loading: keysLoading, error: keysError } = accessKeys;
   const fullAccess = keys?.filter((k) => k.permission === "FullAccess") ?? [];
   const limited = keys?.filter((k) => k.permission !== "FullAccess") ?? [];
 
@@ -117,10 +95,12 @@ export default function DetailsTab({
         </h2>
         {keysError ? (
           <p className="text-gray-500">{keysError}</p>
-        ) : !keys ? (
+        ) : keysLoading ? (
           <p className="flex items-center gap-2 text-gray-500">
             <Loader2 className="size-4 animate-spin" /> Loading keys…
           </p>
+        ) : !keys ? (
+          <p className="text-gray-500">This account does not exist, so it has no keys.</p>
         ) : keys.length === 0 ? (
           <p className="text-gray-500">
             No access keys. Nobody can sign transactions for this account directly.
@@ -131,14 +111,17 @@ export default function DetailsTab({
               {fullAccess.length} full-access {fullAccess.length === 1 ? "key" : "keys"} (can do
               anything) and {limited.length} limited {limited.length === 1 ? "key" : "keys"} (can only
               call one app).
+              {summary && summary.types.length > 0 && (
+                <>
+                  {" "}Key types:{" "}
+                  {summary.types.map((t) => `${t.count} ${t.curve || "unknown"}`).join(", ")}.
+                </>
+              )}
             </p>
             <ul className="divide-y divide-gray-100">
               {[...fullAccess, ...limited].slice(0, 100).map((k) => (
                 <li key={k.public_key} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2">
-                  <span className="inline-flex items-center gap-0.5 font-mono text-xs" title={k.public_key}>
-                    {shortenMiddle(k.public_key, 18, 8)}
-                    <CopyButton text={k.public_key} label="Copy public key" />
-                  </span>
+                  <PublicKey publicKey={k.public_key} />
                   {k.permission === "FullAccess" ? (
                     <span className="rounded-md bg-accent-100 px-1.5 py-0.5 text-xs font-medium text-accent-800">
                       Full access

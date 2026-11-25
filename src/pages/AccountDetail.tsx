@@ -7,6 +7,7 @@ import useTxDetails from "../hooks/useTxDetails";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import useAccountOverview from "../hooks/useAccountOverview";
 import useAccountState from "../hooks/useAccountState";
+import useAccessKeys from "../hooks/useAccessKeys";
 import useAccountFilters from "../hooks/useAccountFilters";
 import useAccountActivity from "../hooks/useAccountActivity";
 import useStakingBalances from "../hooks/useStakingBalances";
@@ -117,6 +118,7 @@ export default function AccountDetail() {
   const overview = useAccountOverview(accountId);
   const accountState = useAccountState(accountId);
   const activity = useAccountActivity(accountId);
+  const accessKeys = useAccessKeys(accountId);
   const { prices } = useTokenPrices();
   const spamTokens = useSpamTokens();
   const spamNfts = useSpamNfts();
@@ -197,6 +199,7 @@ export default function AccountDetail() {
         loading={holdingsLoading}
         totals={totals}
         activity={activity}
+        accessKeys={accessKeys.summary}
         prices={prices}
       />
 
@@ -255,7 +258,12 @@ export default function AccountDetail() {
         <StakingTab pools={pools} balances={staking} validatorStake={validatorStake} />
       )}
       {tab === "details" && (
-        <DetailsTab accountId={accountId} state={state} storageBytes={storageBytes} />
+        <DetailsTab
+          accountId={accountId}
+          state={state}
+          storageBytes={storageBytes}
+          accessKeys={accessKeys}
+        />
       )}
     </div>
   );
