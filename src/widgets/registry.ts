@@ -1,31 +1,30 @@
 import type { ComponentType } from "react";
 import type { TransactionDetail } from "../api/types";
+import type { ParsedTx } from "../utils/parseTransaction";
 import DefaultTxWidget from "./DefaultTxWidget";
-import NearTransferWidget, { matchNearTransfer } from "./NearTransferWidget";
-import FtTransferWidget, { matchFtTransfer } from "./FtTransferWidget";
+
+export interface WidgetProps {
+  tx: TransactionDetail;
+  /** The same transaction, already normalized (parsed once by the page) */
+  parsed: ParsedTx;
+}
 
 export interface Widget {
   id: string;
-  match: (tx: TransactionDetail) => boolean;
-  component: ComponentType<{ tx: TransactionDetail }>;
-  /** Explanation widgets render above receipts; utility widgets render below */
+  match: (tx: TransactionDetail, parsed: ParsedTx) => boolean;
+  component: ComponentType<WidgetProps>;
+  /**
+   * Explanation widgets render under the summary (protocol-specific detail
+   * such as an intents breakdown); utility widgets render in the advanced area.
+   */
   type: "explanation" | "utility";
 }
 
-/** Order matters — first match of each type wins display position */
+/**
+ * Every matching widget is rendered, in this order. The general one-sentence
+ * summary and balance changes come from `summarizeTx`, not from widgets.
+ */
 const registry: Widget[] = [
-  {
-    id: "near-transfer",
-    match: matchNearTransfer,
-    component: NearTransferWidget,
-    type: "explanation",
-  },
-  {
-    id: "ft-transfer",
-    match: matchFtTransfer,
-    component: FtTransferWidget,
-    type: "explanation",
-  },
   {
     id: "default",
     match: () => true,
@@ -34,10 +33,6 @@ const registry: Widget[] = [
   },
 ];
 
-export function getMatchingWidgets(tx: TransactionDetail): Widget[] {
-  return registry.filter((w) => w.match(tx));
-}
-
-export function registerWidget(widget: Widget) {
-  registry.push(widget);
+export function getMatchingWidgets(tx: TransactionDetail, parsed: ParsedTx): Widget[] {
+  return registry.filter((w) => w.match(tx, parsed));
 }

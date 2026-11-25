@@ -159,3 +159,19 @@ export interface AccountFilters {
   to_tx_block_height?: number;
   desc?: boolean;
 }
+
+// /v0/receipt
+export interface ReceiptLookup {
+  receipt_id: string;
+  transaction_hash: string;
+  block_height: number;
+  predecessor_id: string;
+  receiver_id: string;
+  receipt_type: string;
+  is_success: boolean;
+}
+
+export interface ReceiptResponse {
+  receipt: ReceiptLookup | null;
+  transaction: TransactionDetail | null;
+}

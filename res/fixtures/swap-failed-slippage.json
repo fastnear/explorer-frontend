@@ -1,0 +1,223 @@
+{
+ "transaction": {
+  "signer_id": "tinykoala595.near",
+  "public_key": "ed25519:AM5Yj3DjR28s15MHsFSh9ERMg1ugmxgCpSVH3TWjZME1",
+  "nonce": 217927753016389,
+  "receiver_id": "v2.ref-finance.near",
+  "actions": [
+   {
+    "FunctionCall": {
+     "method_name": "swap",
+     "args": "eyJhY3Rpb25zIjpbeyJwb29sX2lkIjo2MDY1LCJ0b2tlbl9pbiI6InplYy5vbWZ0Lm5lYXIiLCJ0b2tlbl9vdXQiOiJ3cmFwLm5lYXIiLCJhbW91bnRfaW4iOiI2ODA4NjY1IiwibWluX2Ftb3VudF9vdXQiOiIxNzQ4MDgwMDEwOTQ1OTQxNjA0MTkxNDM2OCJ9XSwic2tpcF9kZWdlbl9wcmljZV9zeW5jIjp0cnVlfQ==",
+     "gas": 100000000000000,
+     "deposit": "1"
+    }
+   }
+  ],
+  "priority_fee": 0,
+  "signature": "ed25519:qC3k9imE9qrVnJvGzT8w3gHr3KFve2gFz7sTPxDBCADdffggaGkFwSHCXDPTTKiMrh3qzpow8XayLXm6G2d1NJL",
+  "hash": "BR1iC7kKpqGynuf1gKokibs8eFm41wmVNGN4AoASsyFH"
+ },
+ "execution_outcome": {
+  "block_hash": "7dRMFMhYNAB5o33p5zqysM7beiiVWhv2qL6xHQ6eBiKn",
+  "block_timestamp": 1795631600222962063,
+  "block_height": 226193253,
+  "index": 1,
+  "id": "BR1iC7kKpqGynuf1gKokibs8eFm41wmVNGN4AoASsyFH",
+  "outcome": {
+   "logs": [],
+   "receipt_ids": [
+    "FeN15H4e9pEeRjXkHNp2Jbvocudac9ZbcfeighHdcH4j"
+   ],
+   "gas_burnt": 316737936130,
+   "tokens_burnt": "31673793613000000000",
+   "executor_id": "tinykoala595.near",
+   "status": {
+    "SuccessReceiptId": "FeN15H4e9pEeRjXkHNp2Jbvocudac9ZbcfeighHdcH4j"
+   },
+   "metadata": {
+    "version": 1,
+    "gas_profile": null
+   }
+  }
+ },
+ "receipts": [
+  {
+   "execution_outcome": {
+    "block_hash": "9wiP8i1Fr1ys1Tv3W8XSyqhtfG7f55LgvtXsw8w46oVT",
+    "block_timestamp": 1795631600790187571,
+    "block_height": 226193254,
+    "index": 21,
+    "id": "FeN15H4e9pEeRjXkHNp2Jbvocudac9ZbcfeighHdcH4j",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [
+      "DmWqJy1SqX2xeetqHpdxQnbb67uR84dRdTNePJBX4Zxt",
+      "6WYzhubWxaL8qpb3FQbzA1t7oPZGVSVUbfdrn7Evixi5"
+     ],
+     "gas_burnt": 3017325244969,
+     "tokens_burnt": "301732524496900000000",
+     "executor_id": "v2.ref-finance.near",
+     "status": {
+      "Failure": {
+       "ActionError": {
+        "index": 0,
+        "kind": {
+         "FunctionCallError": {
+          "ExecutionError": "Smart contract panicked: panicked at 'E68: slippage error', ref-exchange/src/simple_pool.rs:313:9"
+         }
+        }
+       }
+      }
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       {
+        "local": "txLoEFi4RvYZ7wFNrqV61ggDdmrgHmatBkpXwtGN1FD"
+       }
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 226193254,
+    "block_hash": "9wiP8i1Fr1ys1Tv3W8XSyqhtfG7f55LgvtXsw8w46oVT",
+    "block_timestamp": 1795631600790187571,
+    "receipt_index": 17,
+    "predecessor_id": "tinykoala595.near",
+    "receiver_id": "v2.ref-finance.near",
+    "receipt_id": "FeN15H4e9pEeRjXkHNp2Jbvocudac9ZbcfeighHdcH4j",
+    "receipt": {
+     "Action": {
+      "signer_id": "tinykoala595.near",
+      "signer_public_key": "ed25519:AM5Yj3DjR28s15MHsFSh9ERMg1ugmxgCpSVH3TWjZME1",
+      "gas_price": "1000000000",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "FunctionCall": {
+         "method_name": "swap",
+         "args": "eyJhY3Rpb25zIjpbeyJwb29sX2lkIjo2MDY1LCJ0b2tlbl9pbiI6InplYy5vbWZ0Lm5lYXIiLCJ0b2tlbl9vdXQiOiJ3cmFwLm5lYXIiLCJhbW91bnRfaW4iOiI2ODA4NjY1IiwibWluX2Ftb3VudF9vdXQiOiIxNzQ4MDgwMDEwOTQ1OTQxNjA0MTkxNDM2OCJ9XSwic2tpcF9kZWdlbl9wcmljZV9zeW5jIjp0cnVlfQ==",
+         "gas": 100000000000000,
+         "deposit": "1"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  },
+  {
+   "execution_outcome": {
+    "block_hash": "7M3teHXijp452T7TGjjVQAbFeTQDD42JcyT7YeMmo9tr",
+    "block_timestamp": 1795631601360786005,
+    "block_height": 226193255,
+    "index": 14,
+    "id": "DmWqJy1SqX2xeetqHpdxQnbb67uR84dRdTNePJBX4Zxt",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [],
+     "gas_burnt": 223182562500,
+     "tokens_burnt": "0",
+     "executor_id": "tinykoala595.near",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       null
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 226193255,
+    "block_hash": "7M3teHXijp452T7TGjjVQAbFeTQDD42JcyT7YeMmo9tr",
+    "block_timestamp": 1795631601360786005,
+    "receipt_index": 10,
+    "predecessor_id": "system",
+    "receiver_id": "tinykoala595.near",
+    "receipt_id": "DmWqJy1SqX2xeetqHpdxQnbb67uR84dRdTNePJBX4Zxt",
+    "receipt": {
+     "Action": {
+      "signer_id": "system",
+      "signer_public_key": "ed25519:11111111111111111111111111111111",
+      "gas_price": "0",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "Transfer": {
+         "deposit": "1"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  },
+  {
+   "execution_outcome": {
+    "block_hash": "7M3teHXijp452T7TGjjVQAbFeTQDD42JcyT7YeMmo9tr",
+    "block_timestamp": 1795631601360786005,
+    "block_height": 226193255,
+    "index": 15,
+    "id": "6WYzhubWxaL8qpb3FQbzA1t7oPZGVSVUbfdrn7Evixi5",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [],
+     "gas_burnt": 223182562500,
+     "tokens_burnt": "0",
+     "executor_id": "tinykoala595.near",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       null
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 226193255,
+    "block_hash": "7M3teHXijp452T7TGjjVQAbFeTQDD42JcyT7YeMmo9tr",
+    "block_timestamp": 1795631601360786005,
+    "receipt_index": 11,
+    "predecessor_id": "system",
+    "receiver_id": "tinykoala595.near",
+    "receipt_id": "6WYzhubWxaL8qpb3FQbzA1t7oPZGVSVUbfdrn7Evixi5",
+    "receipt": {
+     "Action": {
+      "signer_id": "tinykoala595.near",
+      "signer_public_key": "ed25519:AM5Yj3DjR28s15MHsFSh9ERMg1ugmxgCpSVH3TWjZME1",
+      "gas_price": "0",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "Transfer": {
+         "deposit": "100586733915491100000000"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  }
+ ],
+ "data_receipts": []
+}

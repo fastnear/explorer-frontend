@@ -1,0 +1,162 @@
+{
+ "transaction": {
+  "signer_id": "closemeat6237.near",
+  "public_key": "ed25519:HFm7Yij3RJFWL1SbG8SCnQYAFzSZuXTtAp2rsQGjxVjE",
+  "nonce": 183974289315948,
+  "receiver_id": "v2.ref-finance.near",
+  "actions": [
+   {
+    "FunctionCall": {
+     "method_name": "swap",
+     "args": "eyJhY3Rpb25zIjpbeyJwb29sX2lkIjo2MDY1LCJ0b2tlbl9pbiI6InplYy5vbWZ0Lm5lYXIiLCJ0b2tlbl9vdXQiOiJ3cmFwLm5lYXIiLCJhbW91bnRfaW4iOiIxNDAwMDAwIiwibWluX2Ftb3VudF9vdXQiOiIzNTU1NDI0OTUyMDE1MzU2MDAwMDAwMDAwIn1dfQ==",
+     "gas": 50000000000000,
+     "deposit": "1"
+    }
+   }
+  ],
+  "priority_fee": 0,
+  "signature": "ed25519:2FDjTapGyVLEpqwMV2nitW8z2Y2ww9bqy167u1HpjsKpjyJaFBVYVeVEEA3XjKieVJZaynoZrJ2zTP6XnMFTSCSC",
+  "hash": "3XqM7oEX8fjyV5iNSbxff7bmyKELaRshEmFbv5Q47s1Z"
+ },
+ "execution_outcome": {
+  "block_hash": "76uNHpezHubND9r5tPiZc3hFLeDHe27SRSB1pTGD5w4r",
+  "block_timestamp": 1795631601975624867,
+  "block_height": 226193256,
+  "index": 2,
+  "id": "3XqM7oEX8fjyV5iNSbxff7bmyKELaRshEmFbv5Q47s1Z",
+  "outcome": {
+   "logs": [],
+   "receipt_ids": [
+    "CuyimKYjhY3b34j3WzWveW7oqWCmDDKTsRp6Zs5VsNBK"
+   ],
+   "gas_burnt": 315307424680,
+   "tokens_burnt": "31530742468000000000",
+   "executor_id": "closemeat6237.near",
+   "status": {
+    "SuccessReceiptId": "CuyimKYjhY3b34j3WzWveW7oqWCmDDKTsRp6Zs5VsNBK"
+   },
+   "metadata": {
+    "version": 1,
+    "gas_profile": null
+   }
+  }
+ },
+ "receipts": [
+  {
+   "execution_outcome": {
+    "block_hash": "FxYuu7GiMjVKxCKTMGwsCdwWXBEPBzvEEQpZpwsfLxfy",
+    "block_timestamp": 1795631602472859352,
+    "block_height": 226193257,
+    "index": 18,
+    "id": "CuyimKYjhY3b34j3WzWveW7oqWCmDDKTsRp6Zs5VsNBK",
+    "outcome": {
+     "logs": [
+      "Swapped 1400000 zec.omft.near for 3591727484301798944361890 wrap.near"
+     ],
+     "receipt_ids": [
+      "2FejRzwybkhBQxsdWqmG3AmkrRDZ3JVRUDBHWWsRqhyv"
+     ],
+     "gas_burnt": 4894864562867,
+     "tokens_burnt": "489486456286700000000",
+     "executor_id": "v2.ref-finance.near",
+     "status": {
+      "SuccessValue": "IjM1OTE3Mjc0ODQzMDE3OTg5NDQzNjE4OTAi"
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       {
+        "local": "txLoEFi4RvYZ7wFNrqV61ggDdmrgHmatBkpXwtGN1FD"
+       }
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 226193257,
+    "block_hash": "FxYuu7GiMjVKxCKTMGwsCdwWXBEPBzvEEQpZpwsfLxfy",
+    "block_timestamp": 1795631602472859352,
+    "receipt_index": 2,
+    "predecessor_id": "closemeat6237.near",
+    "receiver_id": "v2.ref-finance.near",
+    "receipt_id": "CuyimKYjhY3b34j3WzWveW7oqWCmDDKTsRp6Zs5VsNBK",
+    "receipt": {
+     "Action": {
+      "signer_id": "closemeat6237.near",
+      "signer_public_key": "ed25519:HFm7Yij3RJFWL1SbG8SCnQYAFzSZuXTtAp2rsQGjxVjE",
+      "gas_price": "1000000000",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "FunctionCall": {
+         "method_name": "swap",
+         "args": "eyJhY3Rpb25zIjpbeyJwb29sX2lkIjo2MDY1LCJ0b2tlbl9pbiI6InplYy5vbWZ0Lm5lYXIiLCJ0b2tlbl9vdXQiOiJ3cmFwLm5lYXIiLCJhbW91bnRfaW4iOiIxNDAwMDAwIiwibWluX2Ftb3VudF9vdXQiOiIzNTU1NDI0OTUyMDE1MzU2MDAwMDAwMDAwIn1dfQ==",
+         "gas": 50000000000000,
+         "deposit": "1"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  },
+  {
+   "execution_outcome": {
+    "block_hash": "HxCeb2M2A7eR5gXBhu5zpagaMoZdRpky8qhj9ysszrqx",
+    "block_timestamp": 1795631602992481298,
+    "block_height": 226193258,
+    "index": 6,
+    "id": "2FejRzwybkhBQxsdWqmG3AmkrRDZ3JVRUDBHWWsRqhyv",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [],
+     "gas_burnt": 223182562500,
+     "tokens_burnt": "0",
+     "executor_id": "closemeat6237.near",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       null
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 226193258,
+    "block_hash": "HxCeb2M2A7eR5gXBhu5zpagaMoZdRpky8qhj9ysszrqx",
+    "block_timestamp": 1795631602992481298,
+    "receipt_index": 20,
+    "predecessor_id": "system",
+    "receiver_id": "closemeat6237.near",
+    "receipt_id": "2FejRzwybkhBQxsdWqmG3AmkrRDZ3JVRUDBHWWsRqhyv",
+    "receipt": {
+     "Action": {
+      "signer_id": "closemeat6237.near",
+      "signer_public_key": "ed25519:HFm7Yij3RJFWL1SbG8SCnQYAFzSZuXTtAp2rsQGjxVjE",
+      "gas_price": "0",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "Transfer": {
+         "deposit": "50398912905681300000000"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  }
+ ],
+ "data_receipts": []
+}

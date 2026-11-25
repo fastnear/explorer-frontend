@@ -1,0 +1,162 @@
+{
+ "transaction": {
+  "signer_id": "wx-cruce.near",
+  "public_key": "ed25519:HLeC85VkNErLSwjLbuqGornCTXDZ81PPpfrwxnffMGix",
+  "nonce": 217838342032592,
+  "receiver_id": "wrap.near",
+  "actions": [
+   {
+    "FunctionCall": {
+     "method_name": "ft_transfer",
+     "args": "eyJyZWNlaXZlcl9pZCI6InUtY2V4ZGV4Lm5lYXIiLCJhbW91bnQiOiIyODEzNjQ4MTAwMDAwMDAwMDAwMDAwMDAwMCJ9",
+     "gas": 20000000000000,
+     "deposit": "1"
+    }
+   }
+  ],
+  "priority_fee": 0,
+  "signature": "ed25519:2bqe7Xb8PvquoBRJqgK9Fku9pm84wP6NPhdaEjmExkNoYqQDBmk9d3fYwMC87v4M87zLuE8DPESfTuq2shzJb5RE",
+  "hash": "3hvahmDJBg56UhCZ6cBfbzpmhfbLKvgNuETsJebgH5hv"
+ },
+ "execution_outcome": {
+  "block_hash": "9KuTR76CQUdZo7jRqHS5AVarzT6Jhm41rWbdzamJikuS",
+  "block_timestamp": 1795631595696353733,
+  "block_height": 226193245,
+  "index": 6,
+  "id": "3hvahmDJBg56UhCZ6cBfbzpmhfbLKvgNuETsJebgH5hv",
+  "outcome": {
+   "logs": [],
+   "receipt_ids": [
+    "2tJFz8fg8H1iUvPfZySGqUoGYMzh2ZHxRDhirbpZ6aQ7"
+   ],
+   "gas_burnt": 311874197200,
+   "tokens_burnt": "31187419720000000000",
+   "executor_id": "wx-cruce.near",
+   "status": {
+    "SuccessReceiptId": "2tJFz8fg8H1iUvPfZySGqUoGYMzh2ZHxRDhirbpZ6aQ7"
+   },
+   "metadata": {
+    "version": 1,
+    "gas_profile": null
+   }
+  }
+ },
+ "receipts": [
+  {
+   "execution_outcome": {
+    "block_hash": "GQudQ2mzqccmdVgWxP59JZFxH4UUmZk7pr2a37Nxhhj3",
+    "block_timestamp": 1795631596352675651,
+    "block_height": 226193246,
+    "index": 23,
+    "id": "2tJFz8fg8H1iUvPfZySGqUoGYMzh2ZHxRDhirbpZ6aQ7",
+    "outcome": {
+     "logs": [
+      "Transfer 28136481000000000000000000 from wx-cruce.near to u-cexdex.near"
+     ],
+     "receipt_ids": [
+      "7SDycKjKbdBEwK3bqfNDcU99d8D7e8YT8Uq14ZzFfADo"
+     ],
+     "gas_burnt": 1698324940082,
+     "tokens_burnt": "169832494008200000000",
+     "executor_id": "wrap.near",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       {
+        "local": "DL2f5xmZ44cQRP6vBMt94rvseH5d5KKnAGis2WkTAsh1"
+       }
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 226193246,
+    "block_hash": "GQudQ2mzqccmdVgWxP59JZFxH4UUmZk7pr2a37Nxhhj3",
+    "block_timestamp": 1795631596352675651,
+    "receipt_index": 20,
+    "predecessor_id": "wx-cruce.near",
+    "receiver_id": "wrap.near",
+    "receipt_id": "2tJFz8fg8H1iUvPfZySGqUoGYMzh2ZHxRDhirbpZ6aQ7",
+    "receipt": {
+     "Action": {
+      "signer_id": "wx-cruce.near",
+      "signer_public_key": "ed25519:HLeC85VkNErLSwjLbuqGornCTXDZ81PPpfrwxnffMGix",
+      "gas_price": "1000000000",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "FunctionCall": {
+         "method_name": "ft_transfer",
+         "args": "eyJyZWNlaXZlcl9pZCI6InUtY2V4ZGV4Lm5lYXIiLCJhbW91bnQiOiIyODEzNjQ4MTAwMDAwMDAwMDAwMDAwMDAwMCJ9",
+         "gas": 20000000000000,
+         "deposit": "1"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  },
+  {
+   "execution_outcome": {
+    "block_hash": "DxQkqoB4JWsnWkbXsJDfh15Z73Qa1PXpv5ktYn4ZfuL3",
+    "block_timestamp": 1795631597006669198,
+    "block_height": 226193247,
+    "index": 27,
+    "id": "7SDycKjKbdBEwK3bqfNDcU99d8D7e8YT8Uq14ZzFfADo",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [],
+     "gas_burnt": 223182562500,
+     "tokens_burnt": "0",
+     "executor_id": "wx-cruce.near",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       null
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 226193247,
+    "block_hash": "DxQkqoB4JWsnWkbXsJDfh15Z73Qa1PXpv5ktYn4ZfuL3",
+    "block_timestamp": 1795631597006669198,
+    "receipt_index": 28,
+    "predecessor_id": "system",
+    "receiver_id": "wx-cruce.near",
+    "receipt_id": "7SDycKjKbdBEwK3bqfNDcU99d8D7e8YT8Uq14ZzFfADo",
+    "receipt": {
+     "Action": {
+      "signer_id": "wx-cruce.near",
+      "signer_public_key": "ed25519:HLeC85VkNErLSwjLbuqGornCTXDZ81PPpfrwxnffMGix",
+      "gas_price": "0",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "Transfer": {
+         "deposit": "20718405880711800000000"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  }
+ ],
+ "data_receipts": []
+}

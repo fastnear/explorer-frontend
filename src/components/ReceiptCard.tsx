@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import type { ReceiptWithOutcome } from "../api/types";
 import { parseAction } from "../utils/parseTransaction";
 import GasAmount from "./GasAmount";
@@ -11,23 +10,8 @@ import Base64Data from "./Base64Data";
 import JsonView from "@uiw/react-json-view";
 import { darkTheme } from "@uiw/react-json-view/dark";
 import { CircleCheck, CircleX } from "lucide-react";
-
-function useIsDark() {
-  const [dark, setDark] = useState(() =>
-    document.documentElement.classList.contains("dark")
-  );
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setDark(document.documentElement.classList.contains("dark"));
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    return () => observer.disconnect();
-  }, []);
-  return dark;
-}
+import useIsDark from "../hooks/useIsDark";
+import { describeFailure } from "../utils/describeFailure";
 
 export function EventLog({ log }: { log: string }) {
   const isDark = useIsDark();
@@ -101,7 +85,8 @@ export function ReceiptResult({
   }
   if ("Failure" in status) {
     return (
-      <div className="overflow-auto rounded border border-gray-200 bg-red-50 p-2 text-xs text-red-700">
+      <div className="overflow-auto rounded border border-red-200 bg-red-50 p-2 text-xs text-red-700">
+        <p className="mb-1 font-sans text-sm font-medium">{describeFailure(status.Failure)}</p>
         <JsonView
           value={status.Failure as object}
           collapsed={2}

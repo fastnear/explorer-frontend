@@ -5,6 +5,7 @@ import type {
   TransactionsResponse,
   AccountResponse,
   AccountFilters,
+  ReceiptResponse,
 } from "./types";
 
 export function getBlocks(
@@ -36,4 +37,9 @@ export function getAccount(
     account_id: accountId,
     ...filters,
   });
+}
+
+/** Look up a receipt by ID; returns the transaction it belongs to */
+export function getReceipt(receiptId: string): Promise<ReceiptResponse> {
+  return fetchApi<ReceiptResponse>("receipt", { receipt_id: receiptId });
 }

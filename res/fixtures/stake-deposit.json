@@ -1,0 +1,415 @@
+{
+ "transaction": {
+  "signer_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+  "public_key": "ed25519:4qjNfDRUywZTk2rWZiridQkrcsohf5XiwEiprvDYpTUs",
+  "nonce": 84496384000020,
+  "receiver_id": "zavodil.poolv1.near",
+  "actions": [
+   {
+    "FunctionCall": {
+     "method_name": "deposit_and_stake",
+     "args": "e30=",
+     "gas": 50000000000000,
+     "deposit": "675450000000000000000000000"
+    }
+   }
+  ],
+  "priority_fee": 0,
+  "signature": "ed25519:42Zfjkw6wxuMRXgXz6vPDokf9tXqETKACQmfjmrMuPDRYKmDWcUogJYa1Qs8PiUgknmW1iyhJB8gJeAhZyxUHXAq",
+  "hash": "6MUaZ6CvkHrPdyCjob68sJjwXoaD88jHACkU1mLmj1Nj"
+ },
+ "execution_outcome": {
+  "block_hash": "4bnTDWdHMYYtKR99Tq5UjdMihWXBdGuop6G27tef5tEd",
+  "block_timestamp": 1795615035413092280,
+  "block_height": 226164056,
+  "index": 0,
+  "id": "6MUaZ6CvkHrPdyCjob68sJjwXoaD88jHACkU1mLmj1Nj",
+  "outcome": {
+   "logs": [],
+   "receipt_ids": [
+    "4ouaH8R1StabHhVgQ7BQ531HURDyeTJAybEfhkj5brQ9"
+   ],
+   "gas_burnt": 308965490585,
+   "tokens_burnt": "30896549058500000000",
+   "executor_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+   "status": {
+    "SuccessReceiptId": "4ouaH8R1StabHhVgQ7BQ531HURDyeTJAybEfhkj5brQ9"
+   },
+   "metadata": {
+    "version": 1,
+    "gas_profile": null
+   }
+  }
+ },
+ "receipts": [
+  {
+   "execution_outcome": {
+    "block_hash": "Gpxm46m4buPUsAtnj8cRvs5ewiDnBQaYTTL9njk4QncE",
+    "block_timestamp": 1795615035977664877,
+    "block_height": 226164057,
+    "index": 33,
+    "id": "4ouaH8R1StabHhVgQ7BQ531HURDyeTJAybEfhkj5brQ9",
+    "outcome": {
+     "logs": [
+      "@390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80 deposited 675450000000000000000000000. New unstaked balance is 675450000000000000000000001",
+      "@390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80 staking 675449999999999999999999999. Received 381974281075284763515835341 new staking shares. Total 2 unstaked balance and 533270100085603507674617464 staking shares",
+      "Contract total staked balance is 21026182436867505478499674237329. Total number of shares 11890533599941142156804877675595"
+     ],
+     "receipt_ids": [
+      "8sdpjBuuQpgtEGGbg1Jvw344m2VzyxSeNwXUU5rE3VHi",
+      "6WCS7sJ64944bQkAB6D6GpvAWZGG4F52vHdYYxrARF8f",
+      "5UZiHjBjFvr7n4CSmScQq75zB3Jv2QWLpzKuKaoxasAA"
+     ],
+     "gas_burnt": 3187291582650,
+     "tokens_burnt": "318729158265000000000",
+     "executor_id": "zavodil.poolv1.near",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       {
+        "local": "J1arLz48fgXcGyCPVckFwLnewNH6j1uw79thsvwqGYTY"
+       }
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 226164057,
+    "block_hash": "Gpxm46m4buPUsAtnj8cRvs5ewiDnBQaYTTL9njk4QncE",
+    "block_timestamp": 1795615035977664877,
+    "receipt_index": 0,
+    "predecessor_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+    "receiver_id": "zavodil.poolv1.near",
+    "receipt_id": "4ouaH8R1StabHhVgQ7BQ531HURDyeTJAybEfhkj5brQ9",
+    "receipt": {
+     "Action": {
+      "signer_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+      "signer_public_key": "ed25519:4qjNfDRUywZTk2rWZiridQkrcsohf5XiwEiprvDYpTUs",
+      "gas_price": "1000000000",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "FunctionCall": {
+         "method_name": "deposit_and_stake",
+         "args": "e30=",
+         "gas": 50000000000000,
+         "deposit": "675450000000000000000000000"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  },
+  {
+   "execution_outcome": {
+    "block_hash": "FTghNMgY9GxntbkqYy98nvoqBm3uqS5Z28JdGzu9vyML",
+    "block_timestamp": 1795615036710206179,
+    "block_height": 226164058,
+    "index": 0,
+    "id": "5UZiHjBjFvr7n4CSmScQq75zB3Jv2QWLpzKuKaoxasAA",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [],
+     "gas_burnt": 7524947687500,
+     "tokens_burnt": "0",
+     "executor_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       null
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 226164058,
+    "block_hash": "FTghNMgY9GxntbkqYy98nvoqBm3uqS5Z28JdGzu9vyML",
+    "block_timestamp": 1795615036710206179,
+    "receipt_index": 39,
+    "predecessor_id": "system",
+    "receiver_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+    "receipt_id": "5UZiHjBjFvr7n4CSmScQq75zB3Jv2QWLpzKuKaoxasAA",
+    "receipt": {
+     "Action": {
+      "signer_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+      "signer_public_key": "ed25519:4qjNfDRUywZTk2rWZiridQkrcsohf5XiwEiprvDYpTUs",
+      "gas_price": "0",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "Transfer": {
+         "deposit": "29471002660471000000000"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  },
+  {
+   "execution_outcome": {
+    "block_hash": "FTghNMgY9GxntbkqYy98nvoqBm3uqS5Z28JdGzu9vyML",
+    "block_timestamp": 1795615036710206179,
+    "block_height": 226164058,
+    "index": 39,
+    "id": "8sdpjBuuQpgtEGGbg1Jvw344m2VzyxSeNwXUU5rE3VHi",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [
+      "8E9fTGE2mAdTuaTGMstYo224wqbjPeFDbB49FMTJ7mUM"
+     ],
+     "gas_burnt": 210277125000,
+     "tokens_burnt": "21027712500000000000",
+     "executor_id": "zavodil.poolv1.near",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       {
+        "local": "J1arLz48fgXcGyCPVckFwLnewNH6j1uw79thsvwqGYTY"
+       }
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 226164058,
+    "block_hash": "FTghNMgY9GxntbkqYy98nvoqBm3uqS5Z28JdGzu9vyML",
+    "block_timestamp": 1795615036710206179,
+    "receipt_index": 37,
+    "predecessor_id": "zavodil.poolv1.near",
+    "receiver_id": "zavodil.poolv1.near",
+    "receipt_id": "8sdpjBuuQpgtEGGbg1Jvw344m2VzyxSeNwXUU5rE3VHi",
+    "receipt": {
+     "Action": {
+      "signer_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+      "signer_public_key": "ed25519:4qjNfDRUywZTk2rWZiridQkrcsohf5XiwEiprvDYpTUs",
+      "gas_price": "1000000000",
+      "output_data_receivers": [
+       {
+        "data_id": "GU936mJRny5jzVNjUBTGoQs5WsbYzEdfiY3Ls3ehDu1C",
+        "receiver_id": "zavodil.poolv1.near"
+       }
+      ],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "Stake": {
+         "stake": "21026182436867505478499674237329",
+         "public_key": "ed25519:HHARoU1hANWF9hu7YRstDDvgyigBhUeUuqecRVr8dpUz"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  },
+  {
+   "execution_outcome": {
+    "block_hash": "AusvRrP2NkNNG1YEAcLgUQjQLdXL8YKzFsqX3TCFWCUR",
+    "block_timestamp": 1795615037372907634,
+    "block_height": 226164059,
+    "index": 2,
+    "id": "8E9fTGE2mAdTuaTGMstYo224wqbjPeFDbB49FMTJ7mUM",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [],
+     "gas_burnt": 7524947687500,
+     "tokens_burnt": "0",
+     "executor_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       null
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 226164059,
+    "block_hash": "AusvRrP2NkNNG1YEAcLgUQjQLdXL8YKzFsqX3TCFWCUR",
+    "block_timestamp": 1795615037372907634,
+    "receipt_index": 40,
+    "predecessor_id": "system",
+    "receiver_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+    "receipt_id": "8E9fTGE2mAdTuaTGMstYo224wqbjPeFDbB49FMTJ7mUM",
+    "receipt": {
+     "Action": {
+      "signer_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+      "signer_public_key": "ed25519:4qjNfDRUywZTk2rWZiridQkrcsohf5XiwEiprvDYpTUs",
+      "gas_price": "0",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "Transfer": {
+         "deposit": "189249412500000000000"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  },
+  {
+   "execution_outcome": {
+    "block_hash": "AusvRrP2NkNNG1YEAcLgUQjQLdXL8YKzFsqX3TCFWCUR",
+    "block_timestamp": 1795615037372907634,
+    "block_height": 226164059,
+    "index": 53,
+    "id": "6WCS7sJ64944bQkAB6D6GpvAWZGG4F52vHdYYxrARF8f",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [
+      "AomXEQvSiP4EpVoP2Xfa4VKYohTucW3rHHdLQe94gCe"
+     ],
+     "gas_burnt": 1441833839021,
+     "tokens_burnt": "144183383902100000000",
+     "executor_id": "zavodil.poolv1.near",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       {
+        "local": "J1arLz48fgXcGyCPVckFwLnewNH6j1uw79thsvwqGYTY"
+       }
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 226164058,
+    "block_hash": "FTghNMgY9GxntbkqYy98nvoqBm3uqS5Z28JdGzu9vyML",
+    "block_timestamp": 1795615036710206179,
+    "receipt_index": 38,
+    "predecessor_id": "zavodil.poolv1.near",
+    "receiver_id": "zavodil.poolv1.near",
+    "receipt_id": "6WCS7sJ64944bQkAB6D6GpvAWZGG4F52vHdYYxrARF8f",
+    "receipt": {
+     "Action": {
+      "signer_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+      "signer_public_key": "ed25519:4qjNfDRUywZTk2rWZiridQkrcsohf5XiwEiprvDYpTUs",
+      "gas_price": "1000000000",
+      "output_data_receivers": [],
+      "input_data_ids": [
+       "GU936mJRny5jzVNjUBTGoQs5WsbYzEdfiY3Ls3ehDu1C"
+      ],
+      "actions": [
+       {
+        "FunctionCall": {
+         "method_name": "on_stake_action",
+         "args": "",
+         "gas": 20000000000000,
+         "deposit": "0"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  },
+  {
+   "execution_outcome": {
+    "block_hash": "B8H4jmL5RyD1GTK4bL9tSdr3TVVeyJMoGTvU3rRdVUfP",
+    "block_timestamp": 1795615037919517481,
+    "block_height": 226164060,
+    "index": 1,
+    "id": "AomXEQvSiP4EpVoP2Xfa4VKYohTucW3rHHdLQe94gCe",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [],
+     "gas_burnt": 7524947687500,
+     "tokens_burnt": "0",
+     "executor_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       null
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 226164060,
+    "block_hash": "B8H4jmL5RyD1GTK4bL9tSdr3TVVeyJMoGTvU3rRdVUfP",
+    "block_timestamp": 1795615037919517481,
+    "receipt_index": 52,
+    "predecessor_id": "system",
+    "receiver_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+    "receipt_id": "AomXEQvSiP4EpVoP2Xfa4VKYohTucW3rHHdLQe94gCe",
+    "receipt": {
+     "Action": {
+      "signer_id": "390ed9f59023c6b589c9727561c0e401e1c284766c5038b12b6d9c95085e7c80",
+      "signer_public_key": "ed25519:4qjNfDRUywZTk2rWZiridQkrcsohf5XiwEiprvDYpTUs",
+      "gas_price": "0",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "Transfer": {
+         "deposit": "20743909655107900000000"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  }
+ ],
+ "data_receipts": [
+  {
+   "block_height": 226164059,
+   "block_hash": "AusvRrP2NkNNG1YEAcLgUQjQLdXL8YKzFsqX3TCFWCUR",
+   "block_timestamp": 1795615037372907634,
+   "receipt_index": 41,
+   "predecessor_id": "zavodil.poolv1.near",
+   "receiver_id": "zavodil.poolv1.near",
+   "receipt_id": "2U8sess4rDEorMMh6oGfdcskDyPDktR4SeiRfhPBF2qv",
+   "receipt": {
+    "Data": {
+     "data_id": "GU936mJRny5jzVNjUBTGoQs5WsbYzEdfiY3Ls3ehDu1C",
+     "data": "",
+     "is_promise_resume": false
+    }
+   },
+   "priority": 0
+  }
+ ]
+}

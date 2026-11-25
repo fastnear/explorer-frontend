@@ -1,7 +1,20 @@
 @import "tailwindcss";
 
+/* `dark:` follows the manual theme toggle (the .dark class), not only the OS setting */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-surface: #ffffff;
+
+  /* Brand accent, taken from the logo gold */
+  --color-accent-50: oklch(0.98 0.03 95);
+  --color-accent-100: oklch(0.95 0.07 95);
+  --color-accent-200: oklch(0.9 0.11 93);
+  --color-accent-400: oklch(0.82 0.15 88);
+  --color-accent-500: oklch(0.75 0.15 82);
+  --color-accent-600: oklch(0.62 0.13 78);
+  --color-accent-700: oklch(0.5 0.11 75);
+  --color-accent-800: oklch(0.4 0.09 72);
 }
 
 .dark {
@@ -19,22 +32,65 @@
   --color-gray-800: oklch(0.93 0.005 264);
   --color-gray-700: oklch(0.87 0.008 264);
   --color-gray-600: oklch(0.72 0.010 264);
-  --color-gray-500: oklch(0.55 0.012 264);
-  --color-gray-400: oklch(0.44 0.012 264);
+  --color-gray-500: oklch(0.62 0.012 264);
+  --color-gray-400: oklch(0.5 0.012 264);
 
-  /* Blues: brighter for dark bg readability */
+  /* Blues: tints dark, text shades bright */
+  --color-blue-50: oklch(0.26 0.05 255);
+  --color-blue-100: oklch(0.31 0.07 255);
+  --color-blue-200: oklch(0.38 0.09 255);
+  --color-blue-300: oklch(0.48 0.12 255);
   --color-blue-500: oklch(0.70 0.18 255);
-  --color-blue-600: oklch(0.65 0.19 255);
-  --color-blue-700: oklch(0.55 0.19 255);
-  --color-blue-800: oklch(0.50 0.18 255);
+  --color-blue-600: oklch(0.72 0.16 255);
+  --color-blue-700: oklch(0.78 0.13 255);
+  --color-blue-800: oklch(0.84 0.1 255);
 
   /* Reds */
   --color-red-50: oklch(0.25 0.06 25);
+  --color-red-100: oklch(0.3 0.08 25);
+  --color-red-200: oklch(0.37 0.1 25);
+  --color-red-300: oklch(0.46 0.13 25);
   --color-red-500: oklch(0.68 0.19 25);
-  --color-red-600: oklch(0.65 0.20 25);
-  --color-red-700: oklch(0.62 0.19 25);
+  --color-red-600: oklch(0.7 0.18 25);
+  --color-red-700: oklch(0.76 0.15 25);
+  --color-red-800: oklch(0.83 0.11 25);
 
-  /* Green / Purple */
-  --color-green-600: oklch(0.68 0.17 145);
-  --color-purple-700: oklch(0.70 0.16 295);
+  /* Greens */
+  --color-green-50: oklch(0.25 0.05 150);
+  --color-green-100: oklch(0.3 0.07 150);
+  --color-green-200: oklch(0.37 0.09 150);
+  --color-green-300: oklch(0.46 0.11 150);
+  --color-green-500: oklch(0.72 0.17 148);
+  --color-green-600: oklch(0.72 0.17 145);
+  --color-green-700: oklch(0.78 0.15 148);
+  --color-green-800: oklch(0.84 0.11 150);
+
+  /* Yellow / orange (pending, burn) */
+  --color-yellow-50: oklch(0.26 0.05 90);
+  --color-yellow-100: oklch(0.31 0.07 90);
+  --color-yellow-200: oklch(0.38 0.08 90);
+  --color-yellow-500: oklch(0.8 0.16 88);
+  --color-yellow-700: oklch(0.84 0.14 90);
+  --color-yellow-800: oklch(0.88 0.11 92);
+  --color-orange-100: oklch(0.31 0.07 60);
+  --color-orange-400: oklch(0.76 0.15 60);
+  --color-orange-700: oklch(0.8 0.14 62);
+
+  /* Purple / teal / pink (kind badges) */
+  --color-purple-100: oklch(0.3 0.08 295);
+  --color-purple-700: oklch(0.78 0.14 295);
+  --color-teal-100: oklch(0.3 0.06 190);
+  --color-teal-700: oklch(0.8 0.11 190);
+  --color-pink-100: oklch(0.3 0.08 350);
+  --color-pink-700: oklch(0.8 0.13 350);
+
+  /* Accent */
+  --color-accent-50: oklch(0.25 0.04 85);
+  --color-accent-100: oklch(0.3 0.06 85);
+  --color-accent-200: oklch(0.38 0.08 85);
+  --color-accent-400: oklch(0.7 0.14 85);
+  --color-accent-500: oklch(0.78 0.15 85);
+  --color-accent-600: oklch(0.82 0.15 88);
+  --color-accent-700: oklch(0.86 0.13 90);
+  --color-accent-800: oklch(0.9 0.1 92);
 }
