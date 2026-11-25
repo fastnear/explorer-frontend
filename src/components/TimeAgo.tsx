@@ -1,4 +1,5 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { formatDateTime } from "../utils/time";
 
 function formatAgo(timestampNs: string): string {
   const seconds = Math.floor((Date.now() - Number(timestampNs) / 1e6) / 1000);
@@ -8,17 +9,6 @@ function formatAgo(timestampNs: string): string {
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours}h ago`;
   return `${Math.floor(hours / 24)}d ago`;
-}
-
-function formatFull(timestampNs: string): string {
-  return new Date(Number(timestampNs) / 1e6).toLocaleString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
 }
 
 function intervalFor(timestampNs: string): number {
@@ -55,7 +45,7 @@ export default function TimeAgo({ timestampNs }: { timestampNs: string }) {
     return () => clearInterval(id);
   }, [timestampNs, showAbsolute]);
 
-  const full = formatFull(timestampNs);
+  const full = useMemo(() => formatDateTime(timestampNs), [timestampNs]);
 
   return (
     <span

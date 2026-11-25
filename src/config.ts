@@ -1,4 +1,6 @@
-const hostname = window.location.hostname;
+// `window` is absent when this module is loaded outside a browser (tests)
+const hasWindow = typeof window !== "undefined";
+const hostname = hasWindow ? window.location.hostname : "";
 
 export const networkId: "mainnet" | "testnet" =
   import.meta.env.VITE_NETWORK_ID === "testnet" ||
@@ -17,5 +19,5 @@ const otherHost =
     ? hostname.replace(/^testnet\./, "")
     : `testnet.${hostname}`;
 
-export const otherNetworkUrl = `${window.location.protocol}//${otherHost}`;
+export const otherNetworkUrl = `${hasWindow ? window.location.protocol : "https:"}//${otherHost}`;
 export const otherNetworkId = networkId === "testnet" ? "mainnet" : "testnet";

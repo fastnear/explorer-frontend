@@ -61,18 +61,15 @@ export function getMtPrice(
   return prices.get("mt:" + contractId + ":" + tokenId);
 }
 
+const USD_CENTS = new Intl.NumberFormat(undefined, {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+const USD_WHOLE = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 });
+
 export function formatUsd(value: number): string {
   if (value < 0.01) return "< $0.01";
-  if (value < 100_000) {
-    return "$" + value.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  }
-  return "$" + value.toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
+  return "$" + (value < 100_000 ? USD_CENTS : USD_WHOLE).format(value);
 }
 
 export default function useTokenPrices(): {

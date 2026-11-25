@@ -43,25 +43,33 @@ function parseFilters(params: URLSearchParams): AccountFilters {
 export default function useAccountFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const filters = useMemo(() => parseFilters(searchParams), [searchParams]);
+  // Keyed by content, so unrelated query params (e.g. the active tab) changing
+  // does not hand consumers a new filters object and trigger a refetch.
+  const filterKey = JSON.stringify(parseFilters(searchParams));
+  const filters = useMemo<AccountFilters>(() => JSON.parse(filterKey), [filterKey]);
 
   const setFilters = useCallback(
     (next: AccountFilters) => {
-      const params = new URLSearchParams();
-      for (const key of BOOLEAN_KEYS) {
-        const val = (next as Record<string, boolean | undefined>)[key];
-        if (val !== undefined) params.set(key, String(val));
-      }
-      for (const key of NUMBER_KEYS) {
-        const val = (next as Record<string, number | undefined>)[key];
-        if (val !== undefined) params.set(key, String(val));
-      }
-      setSearchParams(params, { replace: true });
+      setSearchParams(
+        (prev) => {
+          // Keep params this hook does not own
+          const params = new URLSearchParams(prev);
+          for (const key of [...BOOLEAN_KEYS, ...NUMBER_KEYS]) params.delete(key);
+          for (const key of BOOLEAN_KEYS) {
+            const val = (next as Record<string, boolean | undefined>)[key];
+            if (val !== undefined) params.set(key, String(val));
+          }
+          for (const key of NUMBER_KEYS) {
+            const val = (next as Record<string, number | undefined>)[key];
+            if (val !== undefined) params.set(key, String(val));
+          }
+          return params;
+        },
+        { replace: true }
+      );
     },
     [setSearchParams]
   );
-
-  const filterKey = useMemo(() => JSON.stringify(filters), [filters]);
 
   const hasActiveFilters = useMemo(
     () => Object.keys(filters).length > 0,

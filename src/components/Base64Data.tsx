@@ -1,7 +1,9 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import JsonView from "@uiw/react-json-view";
 import { darkTheme } from "@uiw/react-json-view/dark";
 import { ChevronRight, ChevronDown } from "lucide-react";
+import useIsDark from "../hooks/useIsDark";
+import { formatCount } from "../utils/format";
 
 type Mode = "json" | "hex" | "base64" | "raw";
 
@@ -31,18 +33,6 @@ function toHex(bytes: Uint8Array): string {
     .join(" ");
 }
 
-function useIsDark() {
-  const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setDark(document.documentElement.classList.contains("dark"));
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
-  return dark;
-}
-
 const btnBase =
   "px-1.5 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer";
 const btnActive = "bg-gray-700 text-white dark:bg-gray-300 dark:text-gray-900";
@@ -62,11 +52,21 @@ function useDecoded(base64: string) {
   }, [base64]);
 }
 
-export default function Base64Data({ base64 }: { base64: string }) {
+export default function Base64Data({
+  base64,
+  defaultOpen,
+  label,
+}: {
+  base64: string;
+  /** What the data is, e.g. "Arguments"; shown on the toggle */
+  label?: string;
+  /** Overrides the default (open for JSON and small payloads) */
+  defaultOpen?: boolean;
+}) {
   const { bytes, text, json, defaultMode, defaultExpanded } = useDecoded(base64);
   const isDark = useIsDark();
 
-  const [expanded, setExpanded] = useState(defaultExpanded);
+  const [expanded, setExpanded] = useState(defaultOpen ?? defaultExpanded);
   const [mode, setMode] = useState<Mode>(defaultMode);
 
   if (!base64) {
@@ -96,9 +96,12 @@ export default function Base64Data({ base64 }: { base64: string }) {
           ) : (
             <ChevronRight className="size-3.5" />
           )}
-          <span>{expanded ? "Hide" : "Show"}</span>
+          <span>
+            {expanded ? "Hide" : "Show"}
+            {label ? ` ${label.toLowerCase()}` : ""}
+          </span>
         </button>
-        <span className="text-gray-400">{bytes.length.toLocaleString()} bytes</span>
+        <span className="text-gray-400">{formatCount(bytes.length)} bytes</span>
         <span className="flex gap-1 ml-auto">
           {modes
             .filter((m) => m.available)

@@ -15,23 +15,15 @@ import AccountId from "./AccountId";
 import NearAmount from "./NearAmount";
 import { CircleAlert, CircleStop, Coins, Image, Loader2 } from "lucide-react";
 import useSpamNfts, { isSpamNft } from "../hooks/useSpamNfts";
-
-function formatTokenAmount(amount: string, decimals: number): string {
-  if (amount === "0") return "0";
-  const padded = amount.padStart(decimals + 1, "0");
-  const whole =
-    padded.slice(0, padded.length - decimals).replace(/^0+/, "") || "0";
-  const frac = padded.slice(padded.length - decimals).replace(/0+$/, "");
-  if (!frac) return whole;
-  return `${whole}.${frac.slice(0, 5)}`;
-}
+import { formatUnits } from "../utils/format";
 
 function TokenIcon({ src, alt }: { src: string; alt: string }) {
   return (
     <img
       src={src}
       alt={alt}
-      className="inline-block size-3.5 rounded-full object-cover align-text-bottom"
+      className="inline-block size-4 rounded-full object-cover align-text-bottom"
+      loading="lazy"
     />
   );
 }
@@ -66,8 +58,11 @@ export function TokenAmount({
   const symbol = truncateSymbol(meta.symbol);
   return (
     <span
-      className={`cursor-pointer font-mono hover:underline decoration-dotted inline-flex items-center gap-0.5 ${showRaw ? "flex-wrap break-all" : "whitespace-nowrap"}`}
-      onClick={() => setShowRaw(!showRaw)}
+      className={`cursor-pointer hover:underline decoration-dotted inline-flex items-center gap-1 ${showRaw ? "flex-wrap break-all" : "whitespace-nowrap"}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        setShowRaw(!showRaw);
+      }}
       title={
         showRaw
           ? `Click to show in ${meta.symbol}`
@@ -76,11 +71,11 @@ export function TokenAmount({
     >
       {showRaw
         ? `${amount} units ${symbol}`
-        : `${formatTokenAmount(amount, meta.decimals)} ${symbol}`}
+        : `${formatUnits(amount, meta.decimals)} ${symbol}`}
       {meta.icon && <TokenIcon src={meta.icon} alt={meta.symbol} />}
       {spam && <span title="Flagged as spam"><CircleAlert className="inline-block size-3 shrink-0 text-red-500" /></span>}
       {!showRaw && usdValue > 0 && (
-        <span className="text-gray-400 font-sans text-xs">{formatUsd(usdValue)}</span>
+        <span className="text-xs font-normal text-gray-400">{formatUsd(usdValue)}</span>
       )}
       {showRaw && contractId && (
         <>
@@ -120,8 +115,15 @@ function MultiTokenAmount({
   const clickable = hasDecimals || contractId;
   return (
     <span
-      className={`font-mono inline-flex items-center gap-0.5${clickable ? " cursor-pointer hover:underline decoration-dotted" : ""} ${showRaw ? "flex-wrap break-all" : "whitespace-nowrap"}`}
-      onClick={clickable ? () => setShowRaw(!showRaw) : undefined}
+      className={`inline-flex items-center gap-1${clickable ? " cursor-pointer hover:underline decoration-dotted" : ""} ${showRaw ? "flex-wrap break-all" : "whitespace-nowrap"}`}
+      onClick={
+        clickable
+          ? (e) => {
+              e.stopPropagation();
+              setShowRaw(!showRaw);
+            }
+          : undefined
+      }
       title={
         clickable
           ? showRaw
@@ -131,12 +133,12 @@ function MultiTokenAmount({
       }
     >
       {hasDecimals && !showRaw
-        ? `${formatTokenAmount(amount, meta.decimals!)} ${label}`
+        ? `${formatUnits(amount, meta.decimals!)} ${label}`
         : `${amount} units ${label}`}
       {meta.media && <TokenIcon src={meta.media} alt={meta.title} />}
       {spam && <span title="Flagged as spam"><CircleAlert className="inline-block size-3 shrink-0 text-red-500" /></span>}
       {!showRaw && usdValue > 0 && (
-        <span className="text-gray-400 font-sans text-xs">{formatUsd(usdValue)}</span>
+        <span className="text-xs font-normal text-gray-400">{formatUsd(usdValue)}</span>
       )}
       {showRaw && contractId && (
         <>
@@ -154,7 +156,7 @@ function MultiTokenAmount({
 
 function MintBadge({ tokenIcon }: { tokenIcon?: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-green-500">
+    <span className="inline-flex items-center gap-0.5 whitespace-nowrap text-xs font-medium text-green-600">
       {tokenIcon}
       <span>Mint</span>
     </span>
@@ -163,7 +165,7 @@ function MintBadge({ tokenIcon }: { tokenIcon?: React.ReactNode }) {
 
 function BurnBadge({ tokenIcon }: { tokenIcon?: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-orange-400">
+    <span className="inline-flex items-center gap-0.5 whitespace-nowrap text-xs font-medium text-orange-400">
       {tokenIcon}
       <span>Burn</span>
     </span>
@@ -180,8 +182,8 @@ function RawTokenAmount({
   tokenId?: string;
 }) {
   return (
-    <span className="font-mono whitespace-nowrap">
-      {amount}{" "}
+    <span className="whitespace-nowrap">
+      {amount} units of{" "}
       {contractId && <AccountId accountId={contractId} />}
       {tokenId && (
         <span className="text-gray-400" title={tokenId}>
@@ -192,11 +194,8 @@ function RawTokenAmount({
   );
 }
 
-export default function TransferSummary({
-  transfer,
-}: {
-  transfer: TransferInfo;
-}) {
+/** The amount of a transfer with its token symbol, icon and current USD value */
+export function TransferAmount({ transfer }: { transfer: TransferInfo }) {
   // Determine token ID prefix for nep245 tokens
   const hasNep141Prefix = transfer.tokenId?.startsWith("nep141:");
   const hasNep245Prefix = transfer.tokenId?.startsWith("nep245:");
@@ -243,6 +242,39 @@ export default function TransferSummary({
   );
 
   const loading = usesMtLookup ? mtLoading : ftLoading;
+
+  return transfer.tokenType === "near" ? (
+    <NearAmount yoctoNear={transfer.amount} showPrice />
+  ) : loading ? (
+    <Loader2 className="inline size-3 animate-spin text-gray-400" />
+  ) : usesMtLookup && mtMeta ? (
+    <MultiTokenAmount
+      amount={transfer.amount}
+      meta={mtMeta}
+      contractId={transfer.contractId}
+      tokenId={transfer.tokenId}
+    />
+  ) : !usesMtLookup && ftMeta ? (
+    <TokenAmount
+      amount={transfer.amount}
+      meta={ftMeta}
+      contractId={transfer.contractId}
+      tokenId={transfer.tokenId}
+    />
+  ) : (
+    <RawTokenAmount
+      amount={transfer.amount}
+      contractId={transfer.contractId}
+      tokenId={transfer.tokenType === "nep245" ? transfer.tokenId : undefined}
+    />
+  );
+}
+
+export default function TransferSummary({
+  transfer,
+}: {
+  transfer: TransferInfo;
+}) {
   const tokenIcon =
     transfer.tokenType === "nep245"
       ? <Coins className="size-3" />
@@ -253,7 +285,7 @@ export default function TransferSummary({
   return (
     <span className="inline-flex flex-wrap items-center gap-1">
       {transfer.from !== null && transfer.to !== null && (
-        <span className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-gray-400">
+        <span className="inline-flex items-center gap-0.5 whitespace-nowrap text-xs text-gray-400">
           {tokenIcon}
         </span>
       )}
@@ -262,33 +294,9 @@ export default function TransferSummary({
       {transfer.from !== null && <AccountId accountId={transfer.from} />}
       <span className="text-gray-400">&rarr;</span>
       {transfer.to !== null && <AccountId accountId={transfer.to} />}
-      {transfer.tokenType === "near" ? (
-        <NearAmount yoctoNear={transfer.amount} showPrice />
-      ) : loading ? (
-        <Loader2 className="size-3 animate-spin text-gray-400" />
-      ) : usesMtLookup && mtMeta ? (
-        <MultiTokenAmount
-          amount={transfer.amount}
-          meta={mtMeta}
-          contractId={transfer.contractId}
-          tokenId={transfer.tokenId}
-        />
-      ) : !usesMtLookup && ftMeta ? (
-        <TokenAmount
-          amount={transfer.amount}
-          meta={ftMeta}
-          contractId={transfer.contractId}
-          tokenId={transfer.tokenId}
-        />
-      ) : (
-        <RawTokenAmount
-          amount={transfer.amount}
-          contractId={transfer.contractId}
-          tokenId={
-            transfer.tokenType === "nep245" ? transfer.tokenId : undefined
-          }
-        />
-      )}
+      <span className="font-medium">
+        <TransferAmount transfer={transfer} />
+      </span>
     </span>
   );
 }
@@ -320,7 +328,7 @@ export function NftTransferSummary({
   return (
     <span className="inline-flex flex-wrap items-center gap-1">
       {!isMint && !isBurn && (
-        <span className="inline-flex items-center gap-0.5 whitespace-nowrap font-mono text-xs text-gray-400">
+        <span className="inline-flex items-center gap-0.5 whitespace-nowrap text-xs text-gray-400">
           {nftLabel}
         </span>
       )}
@@ -329,7 +337,7 @@ export function NftTransferSummary({
       {transfer.from !== null && <AccountId accountId={transfer.from} />}
       <span className="text-gray-400">&rarr;</span>
       {transfer.to !== null && <AccountId accountId={transfer.to} />}
-      <span className="font-mono whitespace-nowrap text-gray-500" title={transfer.tokenId}>
+      <span className="whitespace-nowrap text-gray-500" title={transfer.tokenId}>
         #{truncateTokenId(transfer.tokenId)}
       </span>
       {spam && (

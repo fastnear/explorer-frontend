@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ScrollText } from "lucide-react";
+import { shortenMiddle } from "../utils/format";
 
 export default function TransactionHash({
   hash,
@@ -11,12 +11,10 @@ export default function TransactionHash({
   return (
     <Link
       to={`/tx/${hash}`}
-      className="inline-flex items-center gap-1 font-mono text-xs text-gray-700 hover:underline"
+      title={truncate ? hash : undefined}
+      className={`font-mono text-xs text-gray-500 hover:text-blue-600 hover:underline ${truncate ? "whitespace-nowrap" : "break-all"}`}
     >
-      <ScrollText className="size-3.5 shrink-0 text-gray-400" />
-      {truncate ? (
-        <span className="inline-block max-w-[10ch] overflow-hidden text-ellipsis whitespace-nowrap align-bottom">{hash}</span>
-      ) : <span className="break-all">{hash}</span>}
+      {truncate ? shortenMiddle(hash, 6, 4) : hash}
     </Link>
   );
 }

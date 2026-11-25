@@ -14,14 +14,16 @@ function detectType(q: string): "block" | "tx" | "account" | null {
 
 const hintLabel: Record<string, string> = {
   block: "Block",
-  tx: "Transaction",
+  // A receipt ID has the same shape; the transaction page resolves either
+  tx: "Transaction or receipt",
   account: "Account",
 };
 
-export default function SearchBar() {
+export default function SearchBar({ size = "normal" }: { size?: "normal" | "large" }) {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
   const type = useMemo(() => detectType(query.trim()), [query]);
+  const large = size === "large";
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -33,40 +35,55 @@ export default function SearchBar() {
     } else if (type === "tx") {
       navigate(`/tx/${q}`);
     } else {
-      if (q.endsWith(".testnet") && networkId === "mainnet") {
-        window.location.href = `${otherNetworkUrl}/account/${q}`;
-      } else if ((q.endsWith(".near") || q.endsWith(".tg")) && networkId === "testnet") {
-        window.location.href = `${otherNetworkUrl}/account/${q}`;
+      const id = q.toLowerCase();
+      if (id.endsWith(".testnet") && networkId === "mainnet") {
+        window.location.href = `${otherNetworkUrl}/account/${id}`;
+      } else if ((id.endsWith(".near") || id.endsWith(".tg")) && networkId === "testnet") {
+        window.location.href = `${otherNetworkUrl}/account/${id}`;
       } else {
-        navigate(`/account/${q}`);
+        navigate(`/account/${id}`);
       }
     }
     setQuery("");
   }
 
   return (
-    <form onSubmit={handleSearch} className="flex gap-2">
+    <form onSubmit={handleSearch} role="search" className="flex gap-2">
       <div className="relative flex-1">
+        <Search
+          className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-gray-400 ${large ? "left-4 size-5" : "left-3 size-4"}`}
+          aria-hidden
+        />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           autoCapitalize="none"
-          placeholder="Search tx, block, or account"
-          className="w-full rounded-lg border border-gray-300 bg-surface px-4 py-2 pr-20 text-sm focus:border-blue-500 focus:outline-none"
+          autoCorrect="off"
+          spellCheck={false}
+          aria-label="Search by account, transaction hash, receipt ID or block"
+          placeholder={
+            large ? "Account, transaction hash or block number" : "Search account, transaction or block"
+          }
+          className={`w-full rounded-xl border border-gray-300 bg-surface text-gray-900 placeholder:text-gray-400 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-200 ${
+            large ? "py-3 pl-12 text-base" : "py-2 pl-9 text-sm"
+          } ${type ? (type === "tx" ? "pr-40" : "pr-20") : "pr-3"
+          }`}
         />
         {type && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-500">
             {hintLabel[type]}
           </span>
         )}
       </div>
       <button
         type="submit"
-        className="rounded-lg bg-blue-600 px-3 py-2 sm:px-4 text-sm font-medium text-white hover:bg-blue-700"
+        className={`cursor-pointer rounded-xl bg-gray-900 font-medium text-gray-50 hover:bg-gray-700 ${
+          large ? "px-5 py-3 text-base" : "px-3 py-2 text-sm sm:px-4"
+        }`}
       >
-        <Search className="size-4 sm:hidden" />
-        <span className="hidden sm:inline">Search</span>
+        <Search className="size-4 sm:hidden" aria-hidden />
+        <span className="sr-only sm:not-sr-only">Search</span>
       </button>
     </form>
   );

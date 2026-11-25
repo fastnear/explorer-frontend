@@ -1,0 +1,411 @@
+{
+ "transaction": {
+  "signer_id": "0here.tg",
+  "public_key": "ed25519:3U9SdJBeVheXhW767ewdfvLvriNza86bD4miwSBz6Xsq",
+  "nonce": 114561102096796,
+  "receiver_id": "vitvit203.tg",
+  "actions": [
+   {
+    "Delegate": {
+     "delegate_action": {
+      "sender_id": "vitvit203.tg",
+      "receiver_id": "mint.sharddog.near",
+      "actions": [
+       {
+        "FunctionCall": {
+         "method_name": "nft_transfer",
+         "args": "eyJyZWNlaXZlcl9pZCI6InZpdHZpdDIwMy1ob3QudGciLCJ0b2tlbl9pZCI6IjQxMDozMDc4In0=",
+         "gas": 60000000000000,
+         "deposit": "1"
+        }
+       }
+      ],
+      "nonce": 112668536026802,
+      "max_block_height": 224337061,
+      "public_key": "ed25519:mCPHBjCUrEZj3Rj3VHb7rL3vkPtLwwoM3TZdyuUeio3"
+     },
+     "signature": "ed25519:2sXoFM6KD4U7QJzo8ZGpNb1Z9N6L8YBPwCs3DG3SjG2CnczHTpmFQ3YTjMAkcNcXZMtcAvp8Rdq6L1BGkyHDGFwu"
+    }
+   }
+  ],
+  "priority_fee": 0,
+  "signature": "ed25519:2G1LtphhFdz2wTFQVG1FEznfHyoJ7meSyiyfTGSXjezCibJfiEDZ8JuzwkqLm8nSHYi51Rb3yj9otpBzWL7CPnaM",
+  "hash": "GevbGsCdhEeAi7aUFwxrZCkQ6jcSknKj7B852zqW9cbK"
+ },
+ "execution_outcome": {
+  "block_hash": "GJXjupovnkqnzr5rTWFtCAqys9Apdc2tsJ8thsM2sTHD",
+  "block_timestamp": 1794325733035752601,
+  "block_height": 223937067,
+  "index": 0,
+  "id": "GevbGsCdhEeAi7aUFwxrZCkQ6jcSknKj7B852zqW9cbK",
+  "outcome": {
+   "logs": [],
+   "receipt_ids": [
+    "6xtNVfRUWRrhndiQ3ywsajrTCdwJCHARJ8U6n8hf9hbt"
+   ],
+   "gas_burnt": 511301992620,
+   "tokens_burnt": "51130199262000000000",
+   "executor_id": "0here.tg",
+   "status": {
+    "SuccessReceiptId": "6xtNVfRUWRrhndiQ3ywsajrTCdwJCHARJ8U6n8hf9hbt"
+   },
+   "metadata": {
+    "version": 1,
+    "gas_profile": null
+   }
+  }
+ },
+ "receipts": [
+  {
+   "execution_outcome": {
+    "block_hash": "4NgMb9DTL6AeFbQuUiEyBS2x2vnLWN4tk9Sdw7jKsu2s",
+    "block_timestamp": 1794325733651698769,
+    "block_height": 223937068,
+    "index": 49,
+    "id": "6xtNVfRUWRrhndiQ3ywsajrTCdwJCHARJ8U6n8hf9hbt",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [
+      "CV9fyFqKCm3vZfBesbJP2tJy2n4SEgPhc9waQ3HUyuyS",
+      "8s7wYrcbDpHT5UgBRaszPdVcoNExfAsLMkm91rHnbY5w"
+     ],
+     "gas_burnt": 511301992620,
+     "tokens_burnt": "51130199262000000000",
+     "executor_id": "vitvit203.tg",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       null
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 223937068,
+    "block_hash": "4NgMb9DTL6AeFbQuUiEyBS2x2vnLWN4tk9Sdw7jKsu2s",
+    "block_timestamp": 1794325733651698769,
+    "receipt_index": 0,
+    "predecessor_id": "0here.tg",
+    "receiver_id": "vitvit203.tg",
+    "receipt_id": "6xtNVfRUWRrhndiQ3ywsajrTCdwJCHARJ8U6n8hf9hbt",
+    "receipt": {
+     "Action": {
+      "signer_id": "0here.tg",
+      "signer_public_key": "ed25519:3U9SdJBeVheXhW767ewdfvLvriNza86bD4miwSBz6Xsq",
+      "gas_price": "1000000000",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "Delegate": {
+         "delegate_action": {
+          "sender_id": "vitvit203.tg",
+          "receiver_id": "mint.sharddog.near",
+          "actions": [
+           {
+            "FunctionCall": {
+             "method_name": "nft_transfer",
+             "args": "eyJyZWNlaXZlcl9pZCI6InZpdHZpdDIwMy1ob3QudGciLCJ0b2tlbl9pZCI6IjQxMDozMDc4In0=",
+             "gas": 60000000000000,
+             "deposit": "1"
+            }
+           }
+          ],
+          "nonce": 112668536026802,
+          "max_block_height": 224337061,
+          "public_key": "ed25519:mCPHBjCUrEZj3Rj3VHb7rL3vkPtLwwoM3TZdyuUeio3"
+         },
+         "signature": "ed25519:2sXoFM6KD4U7QJzo8ZGpNb1Z9N6L8YBPwCs3DG3SjG2CnczHTpmFQ3YTjMAkcNcXZMtcAvp8Rdq6L1BGkyHDGFwu"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  },
+  {
+   "execution_outcome": {
+    "block_hash": "3FwRjT8HLPUj5bmqfFUu3RwzkzxS4eqKoi2PJggNP75e",
+    "block_timestamp": 1794325734272748483,
+    "block_height": 223937069,
+    "index": 7,
+    "id": "8s7wYrcbDpHT5UgBRaszPdVcoNExfAsLMkm91rHnbY5w",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [],
+     "gas_burnt": 223182562500,
+     "tokens_burnt": "0",
+     "executor_id": "0here.tg",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       null
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 223937069,
+    "block_hash": "3FwRjT8HLPUj5bmqfFUu3RwzkzxS4eqKoi2PJggNP75e",
+    "block_timestamp": 1794325734272748483,
+    "receipt_index": 52,
+    "predecessor_id": "system",
+    "receiver_id": "0here.tg",
+    "receipt_id": "8s7wYrcbDpHT5UgBRaszPdVcoNExfAsLMkm91rHnbY5w",
+    "receipt": {
+     "Action": {
+      "signer_id": "0here.tg",
+      "signer_public_key": "ed25519:3U9SdJBeVheXhW767ewdfvLvriNza86bD4miwSBz6Xsq",
+      "gas_price": "0",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "Transfer": {
+         "deposit": "460171793358000000000"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  },
+  {
+   "execution_outcome": {
+    "block_hash": "3FwRjT8HLPUj5bmqfFUu3RwzkzxS4eqKoi2PJggNP75e",
+    "block_timestamp": 1794325734272748483,
+    "block_height": 223937069,
+    "index": 39,
+    "id": "CV9fyFqKCm3vZfBesbJP2tJy2n4SEgPhc9waQ3HUyuyS",
+    "outcome": {
+     "logs": [
+      "EVENT_JSON:{\"standard\":\"nep171\",\"version\":\"1.0.0\",\"event\":\"nft_transfer\",\"data\":[{\"old_owner_id\":\"vitvit203.tg\",\"new_owner_id\":\"vitvit203-hot.tg\",\"token_ids\":[\"410:3078\"]}]}"
+     ],
+     "receipt_ids": [
+      "GQ8nENuNw7RJwSXS2NerAQtjtfuCF7AWsf3p2R2bBagp",
+      "GsrvsvxpGpM2728oTKAcxjmp2n7hJmZXginz77bi9dcu"
+     ],
+     "gas_burnt": 3525534121792,
+     "tokens_burnt": "352553412179200000000",
+     "executor_id": "mint.sharddog.near",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       {
+        "local": "6Aorcy6hdJq6etjRw91LouEsmuu7j8FdJvrXwMREgix3"
+       }
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 223937069,
+    "block_hash": "3FwRjT8HLPUj5bmqfFUu3RwzkzxS4eqKoi2PJggNP75e",
+    "block_timestamp": 1794325734272748483,
+    "receipt_index": 51,
+    "predecessor_id": "vitvit203.tg",
+    "receiver_id": "mint.sharddog.near",
+    "receipt_id": "CV9fyFqKCm3vZfBesbJP2tJy2n4SEgPhc9waQ3HUyuyS",
+    "receipt": {
+     "Action": {
+      "signer_id": "0here.tg",
+      "signer_public_key": "ed25519:3U9SdJBeVheXhW767ewdfvLvriNza86bD4miwSBz6Xsq",
+      "gas_price": "1000000000",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "FunctionCall": {
+         "method_name": "nft_transfer",
+         "args": "eyJyZWNlaXZlcl9pZCI6InZpdHZpdDIwMy1ob3QudGciLCJ0b2tlbl9pZCI6IjQxMDozMDc4In0=",
+         "gas": 60000000000000,
+         "deposit": "1"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  },
+  {
+   "execution_outcome": {
+    "block_hash": "7RefSRu4C1D6eddSTrWyRZQoUToKGmi988AEBJN1eBL",
+    "block_timestamp": 1794325734816241884,
+    "block_height": 223937070,
+    "index": 4,
+    "id": "GsrvsvxpGpM2728oTKAcxjmp2n7hJmZXginz77bi9dcu",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [],
+     "gas_burnt": 223182562500,
+     "tokens_burnt": "0",
+     "executor_id": "0here.tg",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       null
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 223937070,
+    "block_hash": "7RefSRu4C1D6eddSTrWyRZQoUToKGmi988AEBJN1eBL",
+    "block_timestamp": 1794325734816241884,
+    "receipt_index": 30,
+    "predecessor_id": "system",
+    "receiver_id": "0here.tg",
+    "receipt_id": "GsrvsvxpGpM2728oTKAcxjmp2n7hJmZXginz77bi9dcu",
+    "receipt": {
+     "Action": {
+      "signer_id": "0here.tg",
+      "signer_public_key": "ed25519:3U9SdJBeVheXhW767ewdfvLvriNza86bD4miwSBz6Xsq",
+      "gas_price": "0",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "Transfer": {
+         "deposit": "60312475568832800000000"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  },
+  {
+   "execution_outcome": {
+    "block_hash": "7RefSRu4C1D6eddSTrWyRZQoUToKGmi988AEBJN1eBL",
+    "block_timestamp": 1794325734816241884,
+    "block_height": 223937070,
+    "index": 43,
+    "id": "GQ8nENuNw7RJwSXS2NerAQtjtfuCF7AWsf3p2R2bBagp",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [
+      "J7TdBYwbbtbuRffsiKKNSvpfQQgJTbjXveBCegaeGssh"
+     ],
+     "gas_burnt": 223182562500,
+     "tokens_burnt": "22318256250000000000",
+     "executor_id": "vitvit203.tg",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       null
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 223937070,
+    "block_hash": "7RefSRu4C1D6eddSTrWyRZQoUToKGmi988AEBJN1eBL",
+    "block_timestamp": 1794325734816241884,
+    "receipt_index": 29,
+    "predecessor_id": "mint.sharddog.near",
+    "receiver_id": "vitvit203.tg",
+    "receipt_id": "GQ8nENuNw7RJwSXS2NerAQtjtfuCF7AWsf3p2R2bBagp",
+    "receipt": {
+     "Action": {
+      "signer_id": "0here.tg",
+      "signer_public_key": "ed25519:3U9SdJBeVheXhW767ewdfvLvriNza86bD4miwSBz6Xsq",
+      "gas_price": "1000000000",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "Transfer": {
+         "deposit": "0"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  },
+  {
+   "execution_outcome": {
+    "block_hash": "GmPo8zAgJVekBtkzywAkSoM6Rba8EWYhex4tmnraQCfU",
+    "block_timestamp": 1794325735356300194,
+    "block_height": 223937071,
+    "index": 1,
+    "id": "J7TdBYwbbtbuRffsiKKNSvpfQQgJTbjXveBCegaeGssh",
+    "outcome": {
+     "logs": [],
+     "receipt_ids": [],
+     "gas_burnt": 223182562500,
+     "tokens_burnt": "0",
+     "executor_id": "0here.tg",
+     "status": {
+      "SuccessValue": ""
+     },
+     "metadata": {
+      "version": 4,
+      "gas_profile": null,
+      "contracts": [
+       null
+      ]
+     }
+    }
+   },
+   "receipt": {
+    "block_height": 223937071,
+    "block_hash": "GmPo8zAgJVekBtkzywAkSoM6Rba8EWYhex4tmnraQCfU",
+    "block_timestamp": 1794325735356300194,
+    "receipt_index": 47,
+    "predecessor_id": "system",
+    "receiver_id": "0here.tg",
+    "receipt_id": "J7TdBYwbbtbuRffsiKKNSvpfQQgJTbjXveBCegaeGssh",
+    "receipt": {
+     "Action": {
+      "signer_id": "0here.tg",
+      "signer_public_key": "ed25519:3U9SdJBeVheXhW767ewdfvLvriNza86bD4miwSBz6Xsq",
+      "gas_price": "0",
+      "output_data_receivers": [],
+      "input_data_ids": [],
+      "actions": [
+       {
+        "Transfer": {
+         "deposit": "200864306250000000000"
+        }
+       }
+      ],
+      "is_promise_yield": false
+     }
+    },
+    "priority": 0
+   }
+  }
+ ],
+ "data_receipts": []
+}

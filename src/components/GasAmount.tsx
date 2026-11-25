@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatCount } from "../utils/format";
 
 export default function GasAmount({ gas }: { gas: number }) {
   const [showRaw, setShowRaw] = useState(false);
@@ -10,7 +11,7 @@ export default function GasAmount({ gas }: { gas: number }) {
       title={showRaw ? "Click to show in Tgas" : "Click to show in Gas"}
     >
       {showRaw ? (
-        <>{gas.toLocaleString()} Gas</>
+        <>{formatCount(gas)} Gas</>
       ) : (
         <>{(gas / 1e12).toFixed(2)} Tgas</>
       )}

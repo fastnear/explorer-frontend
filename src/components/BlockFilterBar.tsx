@@ -87,7 +87,7 @@ export default function BlockFilterBar({
               onKeyDown={(e) => {
                 if (e.key === "Enter") (e.target as HTMLInputElement).blur();
               }}
-              className="w-36 rounded border border-gray-200 bg-white px-2 py-1 text-xs focus:border-blue-300 focus:outline-none"
+              className="w-36 rounded border border-gray-200 bg-surface px-2 py-1 text-xs focus:border-blue-300 focus:outline-none"
             />
             <span className="text-xs text-gray-400">to</span>
             <input
@@ -98,7 +98,7 @@ export default function BlockFilterBar({
               onKeyDown={(e) => {
                 if (e.key === "Enter") (e.target as HTMLInputElement).blur();
               }}
-              className="w-36 rounded border border-gray-200 bg-white px-2 py-1 text-xs focus:border-blue-300 focus:outline-none"
+              className="w-36 rounded border border-gray-200 bg-surface px-2 py-1 text-xs focus:border-blue-300 focus:outline-none"
             />
           </div>
         </div>
