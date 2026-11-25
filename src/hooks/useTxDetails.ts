@@ -7,7 +7,12 @@ const BATCH_SIZE = 20;
 const PENDING_RETRY_MS = 2500;
 const PENDING_MAX_RETRIES = 4;
 
-export default function useTxDetails(hashes: string[], key?: string) {
+export default function useTxDetails(
+  hashes: string[],
+  key?: string,
+  /** `prune` forgets transactions that are no longer requested, for feeds that run indefinitely */
+  { prune = false }: { prune?: boolean } = {}
+) {
   const [txMap, setTxMap] = useState<Map<string, ParsedTx>>(new Map());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -92,6 +97,20 @@ export default function useTxDetails(hashes: string[], key?: string) {
       fetchBatch(missing.slice(i, i + BATCH_SIZE), false);
     }
   }, [hashes.join(",")]);
+
+  useEffect(() => {
+    if (!prune) return;
+    const keep = new Set(hashes);
+    for (const h of knownRef.current) {
+      if (keep.has(h)) continue;
+      knownRef.current.delete(h);
+      retriesRef.current.delete(h);
+    }
+    setTxMap((prev) => {
+      const next = new Map([...prev].filter(([h]) => keep.has(h)));
+      return next.size === prev.size ? prev : next;
+    });
+  }, [hashes.join(","), prune]);
 
   return { txMap, loading, error };
 }

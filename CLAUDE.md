@@ -36,7 +36,7 @@ Routes are defined in `src/App.tsx`, all wrapped in a shared `Layout`:
 - **api.fastnear.com** (`src/api/fastnearApi.ts`): an account's tokens, NFT collections and staking pools.
 - Token metadata via RPC (`useTokenMetadata`, `useMultiTokenMetadata`), spot prices (`useTokenPrices`), spam lists (`useSpamTokens`, `useSpamNfts`).
 
-There is no network-wide "latest transactions" endpoint; `useLatestActivity` assembles the home feed from the newest blocks, a few blocks behind the tip.
+There is no network-wide "latest transactions" endpoint; `useLatestActivity` assembles the home feed from the newest blocks, a few blocks behind the tip. `useSettledTxs` adds a transaction to that feed only once its details have loaded, and holds the list still while the mouse is over it.
 
 ### Two-tier transaction model
 

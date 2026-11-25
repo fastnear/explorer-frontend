@@ -1,9 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Activity, Blocks as BlocksIcon, Box, CircleDollarSign, Coins, Timer } from "lucide-react";
+import { Activity, Blocks as BlocksIcon, Box, CircleDollarSign, Coins, Pause, Timer } from "lucide-react";
 import type { BlockHeader } from "../api/types";
 import useLatestActivity from "../hooks/useLatestActivity";
-import useTxDetails from "../hooks/useTxDetails";
+import useSettledTxs from "../hooks/useSettledTxs";
 import useTokenPrices from "../hooks/useTokenPrices";
 import { networkId } from "../config";
 import AccountId from "../components/AccountId";
@@ -15,6 +15,7 @@ import TimeAgo from "../components/TimeAgo";
 import TxFeed, { type TxFeedItem } from "../components/TxFeed";
 
 const BLOCKS_SHOWN = 10;
+const TXS_SHOWN = 12;
 
 interface NetworkStats {
   height: number;
@@ -52,11 +53,14 @@ export default function Home() {
   const stats = useMemo(() => computeStats(blocks), [blocks]);
   const nearPrice = prices?.get("wrap.near")?.price;
 
-  const hashes = useMemo(() => txs.map((t) => t.transaction_hash), [txs]);
-  const { txMap } = useTxDetails(hashes);
+  // The feed holds still while the mouse is over it, and new transactions
+  // join it only once they can be shown as a sentence.
+  const [paused, setPaused] = useState(false);
+  const { rows, txMap } = useSettledTxs(txs, paused, TXS_SHOWN);
   const feedItems: TxFeedItem[] = useMemo(
     () =>
-      txs.map((t) => ({
+      // Before the first details arrive, show what we know as placeholders
+      (rows.length > 0 ? rows : txs).map((t) => ({
         hash: t.transaction_hash,
         timestamp: t.tx_block_timestamp,
         tx: txMap.get(t.transaction_hash),
@@ -67,7 +71,7 @@ export default function Home() {
           status: !t.is_completed ? "pending" : t.is_success ? "success" : "failed",
         },
       })),
-    [txs, txMap]
+    [rows, txs, txMap]
   );
 
   const placeholder = <Skeleton className="h-6 w-20" />;
@@ -125,11 +129,23 @@ export default function Home() {
       )}
 
       <div className="grid gap-6 lg:grid-cols-5">
-        <section className="min-w-0 lg:col-span-3">
-          <h2 className="mb-2 flex items-center gap-2 text-base font-semibold">
-            <Activity className="size-4 text-gray-400" aria-hidden />
-            Latest transactions
-          </h2>
+        <section
+          className="min-w-0 lg:col-span-3"
+          // Touch has no hover to end, so only a mouse pauses the feed
+          onPointerEnter={(e) => e.pointerType === "mouse" && setPaused(true)}
+          onPointerLeave={() => setPaused(false)}
+        >
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <h2 className="flex items-center gap-2 text-base font-semibold">
+              <Activity className="size-4 text-gray-400" aria-hidden />
+              Latest transactions
+            </h2>
+            {paused && rows.length > 0 && (
+              <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                <Pause className="size-3" aria-hidden /> Paused while you hover
+              </span>
+            )}
+          </div>
           <TxFeed
             items={feedItems}
             filterBar={null}
